@@ -10,6 +10,6 @@
   "license": "MIT",
   "scripts": {
     "start:dev:server": "yarn workspace server start:dev",
-    "start:dev:client": "yarn workspace board dev"
+    "start:dev:client": "yarn workspace client dev"
   }
 }
