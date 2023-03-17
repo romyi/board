@@ -1,5 +1,10 @@
-import React from "react";
+import svg_path from "./card_basic.svg";
 
 export const Intro = () => {
-  return <div className="bg-slate-100 m-auto max-w-[800px] p-4">la</div>;
+  return (
+    <>
+      <h2>intro</h2>
+      <img src={svg_path} />
+    </>
+  );
 };
