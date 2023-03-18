@@ -4,7 +4,11 @@ module.exports = {
     container: {
       center: true,
     },
-    extend: {},
+    extend: {
+      fontFamily: {
+        rubik: ['"Rubik"', "sans-serif"],
+      },
+    },
   },
   plugins: [],
 };
