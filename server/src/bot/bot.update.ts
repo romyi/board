@@ -1,35 +1,39 @@
 import { AuthService } from "@app/auth/auth.service";
 import { UserService } from "@app/user/user.service";
-import { Hears, InjectBot, Start, Update } from "nestjs-telegraf";
-import { Context, Telegraf } from "telegraf";
-import { Message } from "telegraf/typings/core/types/typegram";
+import { Command, Ctx, Hears, InjectBot, Start, Update } from "nestjs-telegraf";
+import { Context, Scenes, Telegraf } from "telegraf";
+import { Chat, ChatFromGetChat, Message } from "telegraf/typings/core/types/typegram";
+import { CustomContext } from "./context";
 
 @Update()
 export class BotUpdate
 {
     constructor(
-        @InjectBot() private readonly bot: Telegraf<Context>,
+        @InjectBot() private readonly bot: Telegraf<CustomContext>,
         private authService: AuthService,
         private userService: UserService
     ) {}
 
     @Start()
-    async start(ctx: Context)
+    async start(@Ctx() ctx: CustomContext)
     {
         const { id } = await ctx.getChat();
         const user = await this.userService.findUser(id);
-        if (user === null) await ctx.reply("Hey! Seems like you first time here. Want to login?");
+        if (user === null) {
+            await ctx.reply("Hey! Seems like you first time here. type /login to enter");
+        }
         else ctx.sendMessage(`hi, ${user.nickname}`);
     }
 
-    @Hears(/\+7[0-9]{10}/)
-    async fetchCode(ctx: Context)
+    @Command("login")
+    async onLogin(@Ctx() ctx: CustomContext)
     {
-        // await this.authService.codes.get()
-        const { text: phone } = ctx.message as Message.TextMessage
-        if (phone) {
-            console.log(phone)
+        if (ctx.session.login === true) {
+            ctx.sendMessage('you already logged in');
+            return;
         }
-        // await ctx.sendMessage(phone ?? 'none');
+        const chat = await ctx.getChat() as Chat & Chat.UserNameChat;
+        await this.userService.createUser({create: {id: chat.id, phone: '', nickname: chat.username}})
+        ctx.session.login = true;
     }
 }

@@ -5,12 +5,12 @@ import { TelegrafModule } from 'nestjs-telegraf';
 import * as LocalSession from 'telegraf-session-local';
 import { BotUpdate } from './bot.update';
 
-// const sessions = new LocalSession({database: 'tg_session.json'});
+const sessions = new LocalSession({database: 'tg_session.json'});
 
 @Module({
   imports: [
     TelegrafModule.forRoot({
-    // middlewares: [sessions.middleware()],
+    middlewares: [sessions.middleware()],
     token: process.env.BOT
     }), 
     AuthModule,
