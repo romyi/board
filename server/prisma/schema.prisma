@@ -14,3 +14,17 @@ model Block {
   id   Int    @id @default(autoincrement())
   name String @unique
 }
+
+model TelegramUser {
+  id          Int    @unique
+  nickname    String
+  phone       String
+  internal_id Int    @unique
+  user        User   @relation(fields: [internal_id], references: [id])
+}
+
+model User {
+  id       Int           @id @unique @default(autoincrement())
+  provider String
+  telegram TelegramUser?
+}

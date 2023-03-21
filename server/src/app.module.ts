@@ -6,9 +6,10 @@ import { RoomModule } from './room/room.module';
 import { BotModule } from './bot/bot.module';
 import { AuthModule } from './auth/auth.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { UserModule } from './user/user.module';
 
 @Module({
-  imports: [GameModule, RoomModule, BotModule, AuthModule, ScheduleModule.forRoot()],
+  imports: [GameModule, RoomModule, BotModule, AuthModule, ScheduleModule.forRoot(), UserModule],
   controllers: [AppController],
   providers: [AppService],
 })

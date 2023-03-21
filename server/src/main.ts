@@ -8,7 +8,7 @@ async function bootstrap() {
 
   app.useWebSocketAdapter(new GameIoAdapter(app));
   app.enableCors({
-    origin: "http://localhost:3033",
+    origin: "http://localhost:5173",
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
   });
