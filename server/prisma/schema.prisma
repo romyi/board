@@ -18,9 +18,9 @@ model Block {
 model TelegramUser {
   id          Int    @unique
   nickname    String
-  phone       String
   internal_id Int    @unique
   user        User   @relation(fields: [internal_id], references: [id])
+  token       Int?
 }
 
 model User {

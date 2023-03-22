@@ -13,13 +13,4 @@ export class AuthController
         const { phone } = request.query;
         this.authService.codegen(phone as String);
     }
-
-    @Get('telegram/code')
-    async getCode(@Req() request: Request)
-    {
-        const { phone } = request.query;
-        const code = this.authService.codeget(phone as String);
-        console.log(code)
-        if (code !== undefined) return {code: code}
-    }
 }

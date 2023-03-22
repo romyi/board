@@ -19,6 +19,7 @@ export class UserService
         const payload = {
             ...data
         }
-        await this.prisma.user.create<Prisma.UserCreateArgs>({ data: {provider: 'tg', telegram: payload} })
+        const user = await this.prisma.user.create<Prisma.UserCreateArgs>({ data: {provider: 'tg', telegram: payload} })
+        return user;
     }
 }

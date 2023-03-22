@@ -28,12 +28,16 @@ export class BotUpdate
     @Command("login")
     async onLogin(@Ctx() ctx: CustomContext)
     {
-        if (ctx.session.login === true) {
+        if (ctx.session.user) {
             ctx.sendMessage('you already logged in');
+            const code = await this.authService.codegen(String(ctx.session.user.id));
+            ctx.sendMessage(`your temporary link: \nhttp://localhost:5173/tg?sec=${code}&id=${ctx.session.user.id}`);
             return;
         }
         const chat = await ctx.getChat() as Chat & Chat.UserNameChat;
-        await this.userService.createUser({create: {id: chat.id, phone: '', nickname: chat.username}})
-        ctx.session.login = true;
+        const user = await this.userService.createUser({create: {id: chat.id, nickname: chat.username}})
+        const code = await this.authService.codegen(String(user.id));
+        ctx.session.user = {id: user.id};
+        ctx.sendMessage(`your temporary link: \nhttp://localhost:5173/tg?sec=${code}&id=${user.id}`);
     }
 }
