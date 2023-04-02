@@ -1,39 +1,23 @@
 import { PrismaService } from '@app/prisma/prisma.service';
 import { UserService } from '@app/user/user.service';
+import { JwtService } from '@nestjs/jwt'
 import { Injectable } from '@nestjs/common';
-import { SchedulerRegistry, Timeout } from '@nestjs/schedule';
-import { randomUUID } from 'crypto';
+import { CodeService } from './codes/code.service';
 
 @Injectable()
 export class AuthService {
 
     constructor(
-        private schedulerRegistry: SchedulerRegistry,
-        private userService: UserService
+        private userService: UserService,
+        private jwtService: JwtService,
+        private codeService: CodeService
     ){}
 
-    public codes: Map<String, String> = new Map();
-
-    async codegen(id: String)
+    async login(user)
     {
-        const existing = this.codes.get(id)
-        if (!existing) {
-            const code = randomUUID();
-            this.codes.set(id, code);
-            const timeout = setTimeout(() => this.stale(id), 10000)
-            this.schedulerRegistry.addTimeout(`stale ${id}`, timeout)
-            return code;
-        } else {
-            return existing
-        }
-    }
-
-    stale(id: String)
-    {
-        console.log(this.codes);
-        console.log('delete code for ', id)
-        this.codes.delete(id);
-        this.schedulerRegistry.deleteTimeout(`stale ${id}`)
-        console.log(this.schedulerRegistry.getTimeouts());
+        const payload = { id: user.internal_id, name: user.nickname }
+        return {
+            access_token: this.jwtService.sign(payload),
+        };
     }
 }

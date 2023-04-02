@@ -4,6 +4,7 @@ import { Command, Ctx, Hears, InjectBot, Start, Update } from "nestjs-telegraf";
 import { Context, Scenes, Telegraf } from "telegraf";
 import { Chat, ChatFromGetChat, Message } from "telegraf/typings/core/types/typegram";
 import { CustomContext } from "./context";
+import { CodeService } from "@app/auth/codes/code.service";
 
 @Update()
 export class BotUpdate
@@ -11,7 +12,8 @@ export class BotUpdate
     constructor(
         @InjectBot() private readonly bot: Telegraf<CustomContext>,
         private authService: AuthService,
-        private userService: UserService
+        private userService: UserService,
+        private codeService: CodeService,
     ) {}
 
     @Start()
@@ -30,13 +32,13 @@ export class BotUpdate
     {
         if (ctx.session.user) {
             ctx.sendMessage('you already logged in');
-            const code = await this.authService.codegen(String(ctx.session.user.id));
+            const code = await this.codeService.generate(String(ctx.session.user.id));
             ctx.sendMessage(`your temporary link: \nhttp://localhost:5173/tg?sec=${code}&id=${ctx.session.user.id}`);
             return;
         }
         const chat = await ctx.getChat() as Chat & Chat.UserNameChat;
         const user = await this.userService.createUser({create: {id: chat.id, nickname: chat.username}})
-        const code = await this.authService.codegen(String(user.id));
+        const code = await this.codeService.generate(String(user.id));
         ctx.session.user = {id: user.id};
         ctx.sendMessage(`your temporary link: \nhttp://localhost:5173/tg?sec=${code}&id=${user.id}`);
     }

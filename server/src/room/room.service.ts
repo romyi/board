@@ -14,7 +14,6 @@ export class RoomService {
     }
 
     public listRooms(): Map<Room['id'], Room> {
-        console.log(this.rooms)
         return this.rooms
     }
 

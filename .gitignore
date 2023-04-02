@@ -3,3 +3,4 @@ node_modules
 */.env
 */tg_session.json
 migrations
+yarn.lock

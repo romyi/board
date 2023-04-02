@@ -7,9 +7,9 @@ export class UserService
 {
     constructor(private prisma: PrismaService ) {}
 
-    findUser(id: number)
+    async findUser(id: number)
     {
-        const user = this.prisma.telegramUser.findFirst({where: {id: id}})
+        const user = await this.prisma.telegramUser.findFirst({where: {internal_id: id}})
         if (user) return user;
         return null
     }
