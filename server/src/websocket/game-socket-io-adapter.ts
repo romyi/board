@@ -6,7 +6,7 @@ export class GameIoAdapter extends IoAdapter
 {
     private options = {
         cors: {
-            origin: "http://localhost:3033",
+            origin: "http://localhost:5173",
         },
         path: '/wsapi',
         transports: ['websocket'],
