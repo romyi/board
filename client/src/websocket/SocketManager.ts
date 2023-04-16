@@ -16,8 +16,10 @@ export default class SocketManager
     {
         this.socket = io('http://localhost:3000', {
             autoConnect: false,
+            extraHeaders: {
+                "authorization": sessionStorage.getItem('token') ?? 'not authorized'
+            },
             path: '/wsapi',
-            transports: ['websocket'],
             withCredentials: true
         })
 

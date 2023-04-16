@@ -14,4 +14,11 @@ export class AuthController
     {
         return this.authService.login(request.user)
     }
+
+    @Get('fake')
+    async fakelogin(@Req() request: Request)
+    {
+        console.log(request.query);
+        return this.authService.fake_login(request.query.id);
+    }
 }

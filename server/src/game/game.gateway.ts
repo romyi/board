@@ -2,13 +2,20 @@ import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, WebSocketGatew
 import { Server, Socket } from 'socket.io';
 import { SubscribeMessage } from '@nestjs/websockets';
 import { RoomService } from "@app/room/room.service";
+import { AuthService } from "@app/auth/auth.service";
+import { UnauthorizedException } from "@nestjs/common";
+
+export interface ExtendedSocket extends Socket {
+  decoded: any
+}
 
 @WebSocketGateway()
 export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
 
   constructor(
-    private roomService: RoomService
+    private roomService: RoomService,
+    private authService: AuthService
   )
   {
   }
@@ -19,10 +26,16 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     this.roomService.server = server;
   }
 
-  async handleConnection(client: Socket, ...args: any[]): Promise<void>
+  async handleConnection(client: ExtendedSocket, ...args: any[]): Promise<void>
   {
     // Call initializers to set up socket
-    console.log(`client ${client.id} connected`)
+    const decoded = await this.authService.decode(client.handshake.headers.authorization)
+    if (decoded) {
+      client.decoded = decoded;
+      console.log(`client ${client.id} connected`)
+    } else {
+      this.handleDisconnect(client);
+    }
   }
 
   async handleDisconnect(client: Socket): Promise<void>
@@ -30,12 +43,14 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     // Handle termination of socket
     this.roomService.terminateSocket(client)
     console.log(`client ${client.id} discconnected`)
+    client.disconnect();
   }
 
   @SubscribeMessage("client.room.list")
   onRoomList()
   {
     const rooms = this.roomService.listRooms()
+    console.log(rooms)
     return {
       event: 'server.room.list',
       data: {
@@ -45,7 +60,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   }
 
   @SubscribeMessage("client.room.create")
-  onRoomCreate(client: Socket)
+  onRoomCreate(client: ExtendedSocket)
   {
     const room = this.roomService.startRoom();
     room.addClient(client);
@@ -59,8 +74,9 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   }
 
   @SubscribeMessage("client.room.join")
-  onRoomJoin(client: Socket, data: string)
+  onRoomJoin(client: ExtendedSocket, data: string)
   {
+    console.log(client.decoded);
     this.roomService.joinRoom(data, client)
   }
 }

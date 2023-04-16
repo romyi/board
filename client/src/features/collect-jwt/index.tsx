@@ -16,11 +16,11 @@ export const Fetcher = () => {
         .catch(),
     onSuccess(data) {
       if (Boolean(data.access_token)) {
-        localStorage.setItem("token", data.access_token);
+        sessionStorage.setItem("token", data.access_token);
         setLocation("/");
       }
     },
-    enabled: !Boolean(localStorage.getItem("token")),
+    enabled: !Boolean(sessionStorage.getItem("token")),
   });
   return (
     <div>
