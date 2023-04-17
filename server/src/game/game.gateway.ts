@@ -4,6 +4,7 @@ import { SubscribeMessage } from '@nestjs/websockets';
 import { RoomService } from "@app/room/room.service";
 import { AuthService } from "@app/auth/auth.service";
 import { UnauthorizedException } from "@nestjs/common";
+import { JwtService } from "@nestjs/jwt";
 
 export interface ExtendedSocket extends Socket {
   decoded: any
@@ -15,7 +16,8 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   constructor(
     private roomService: RoomService,
-    private authService: AuthService
+    private authService: AuthService,
+    private jwtService: JwtService
   )
   {
   }
@@ -29,11 +31,17 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   async handleConnection(client: ExtendedSocket, ...args: any[]): Promise<void>
   {
     // Call initializers to set up socket
-    const decoded = await this.authService.decode(client.handshake.headers.authorization)
-    if (decoded) {
+    try {
+      const verified = await this.jwtService.verifyAsync(client.handshake.headers.authorization, { secret: process.env.JWT_SECRET });
+      const decoded = await this.authService.decode(client.handshake.headers.authorization)
+    if (verified) {
       client.decoded = decoded;
       console.log(`client ${client.id} connected`)
     } else {
+      this.handleDisconnect(client);
+    }
+      
+    } catch {
       this.handleDisconnect(client);
     }
   }
@@ -68,7 +76,8 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     return {
       event: 'server.game.message',
       data: {
-        message: 'room created'
+        message: 'room created',
+        id: room.id
       }
     }
   }

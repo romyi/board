@@ -46,7 +46,10 @@ export default class SocketManager
     private onConnect(): void
     {
         this.socket.on('connect', () => {
-            console.log('connected')
+            this.setSocketState((state) => {
+                return {...state, connected: true}
+            })
+            this.emit({event: 'client.room.create'})
         })
     }
 
