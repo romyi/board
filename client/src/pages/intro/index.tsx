@@ -1,10 +1,10 @@
-import { AuthList } from "@features/index";
+import { AuthList, UserStats } from "@features/index";
 import svg_path from "./card_basic.svg";
 
 export const Intro = () => {
   return (
-    <main className="max-w-[1000px] m-auto">
-      {sessionStorage.getItem("token") && <h1>Hi</h1>}
+    <main className="max-w-[800px] m-auto h-screen">
+      {sessionStorage.getItem("token") && <UserStats />}
       {!Boolean(sessionStorage.getItem("token")) && <AuthList />}
     </main>
   );
