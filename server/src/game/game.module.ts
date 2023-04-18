@@ -9,7 +9,7 @@ import { JwtModule } from '@nestjs/jwt';
 @Module({
   imports: [RoomModule, AuthModule, JwtModule.register({
     secret: process.env.JWT_SECRET,
-    signOptions: { expiresIn: '1000s' }
+    signOptions: { expiresIn: '2 days' }
   })],
   providers: [GameGateway],
   controllers: [RoomController]

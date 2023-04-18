@@ -11,7 +11,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 @Module({
   imports: [PrismaModule, UserModule, JwtModule.register({
     secret: process.env.JWT_SECRET,
-    signOptions: { expiresIn: '1000s' }
+    signOptions: { expiresIn: '2 days' }
   })],
   providers: [AuthService, CodeService, CustomStrategy, JwtStrategy],
   controllers: [AuthController],

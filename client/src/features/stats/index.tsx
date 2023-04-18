@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import React from "react";
+import Lottie from "lottie-react";
+import blob_animation from "./blob.lottie.json";
 
 export const UserStats = () => {
   const { data, isLoading } = useQuery<any, any, { name: string }, any>({
@@ -18,6 +19,7 @@ export const UserStats = () => {
       {isLoading && <p>...</p>}
       {data && (
         <>
+          <Lottie animationData={blob_animation} loop />
           <h1 className="text-[32px] text-slate-800 font-bold">{data.name}</h1>
           <div className="max-w-[300px] p-2 text-left">
             <h2>games</h2>

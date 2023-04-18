@@ -12,7 +12,7 @@ import { JwtModule } from '@nestjs/jwt';
 @Module({
   imports: [GameModule, RoomModule, BotModule, AuthModule, ScheduleModule.forRoot(), UserModule, JwtModule.register({
     secret: process.env.JWT_SECRET,
-    signOptions: { expiresIn: '1000s' }
+    signOptions: { expiresIn: '2 days' }
   })],
   controllers: [AppController],
   providers: [AppService],

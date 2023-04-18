@@ -1,4 +1,4 @@
-import { AuthList, RoomCreate, UserStats } from "@features/index";
+import { AuthList, Notification, RoomCreate, UserStats } from "@features/index";
 import svg_path from "./card_basic.svg";
 
 export const Intro = () => {
@@ -6,6 +6,7 @@ export const Intro = () => {
     <main className="max-w-[800px] m-auto h-screen">
       {sessionStorage.getItem("token") && (
         <>
+          <Notification />
           <UserStats />
           <RoomCreate />
         </>
