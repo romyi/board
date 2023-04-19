@@ -13,4 +13,13 @@ export class UserController
     {
         return request['user'];
     }
+
+    @UseGuards(JwtAuthGuard)
+    @Get('online')
+    async ShowOnline(@Req() req: Request & {user: any})
+    {
+        const users = await this.userService.getOnlineUsers(req.user.id);
+        console.log(users);
+        return users;
+    }
 }

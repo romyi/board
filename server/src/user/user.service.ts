@@ -27,4 +27,11 @@ export class UserService
         const updated = await this.prisma.user.update<Prisma.UserUpdateArgs>({ where: {id: user_id}, data: {connection: connection_id}})
         return updated
     }
+
+    async getOnlineUsers(user_id)
+    {
+        const data = await this.prisma.user.findMany({where: { connection: { not: null }, id: { not: user_id } }})
+        console.log('data', data);
+        return data;
+    }
 }
