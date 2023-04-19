@@ -19,7 +19,9 @@
     "baseUrl": "./src",
     "paths": {
       "@features/*": ["features/*"],
-      "@states/*": ["states/*"]
+      "@states/*": ["states/*"],
+      "@hooks/*": ["hooks/*"],
+      "@shared/*": ["../../shared/*"]
     }
   },
   "include": ["src"],

@@ -1,9 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import useSocketManager from "../../hooks/useSocketManager";
 import { useEffect } from "react";
+import { InviteButton, useInvite } from "..";
 
 export const OnlineList = () => {
   const { sm } = useSocketManager();
+  const { invite } = useInvite();
   const { data, refetch } = useQuery({
     retry: false,
     queryKey: ["online"],
@@ -20,7 +22,10 @@ export const OnlineList = () => {
     <div className="h-[100px] flex flex-wrap flex-col">
       {data?.map((user: any) => (
         <div key={user.id}>
-          <h2>{user.id}</h2>
+          <div className="flex gap-2">
+            <h2>{user.id}</h2>
+            <button onClick={() => invite(String(user.id))}>+</button>
+          </div>
         </div>
       ))}
     </div>

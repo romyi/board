@@ -8,7 +8,9 @@ export default defineConfig({
   resolve: {
     alias: {
       "@features": path.resolve(__dirname, "./src/features"),
-      "@states": path.resolve(__dirname, "./src/states")
+      "@states": path.resolve(__dirname, "./src/states"),
+      "@hooks": path.resolve(__dirname, "./src/hooks"),
+      "@shared": path.resolve(__dirname, "../shared")
     },
   }
 })
