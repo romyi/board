@@ -24,7 +24,9 @@ model TelegramUser {
 }
 
 model User {
-  id       Int           @id @unique @default(autoincrement())
-  provider String
-  telegram TelegramUser?
+  id         Int           @id @unique @default(autoincrement())
+  provider   String
+  telegram   TelegramUser?
+  connection String?
+  room       String?
 }

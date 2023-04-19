@@ -22,4 +22,9 @@ export class UserService
         const user = await this.prisma.user.create<Prisma.UserCreateArgs>({ data: {provider: 'tg', telegram: payload} })
         return user;
     }
+
+    async updateUserConnection(connection_id, user_id) {
+        const updated = await this.prisma.user.update<Prisma.UserUpdateArgs>({ where: {id: user_id}, data: {connection: connection_id}})
+        return updated
+    }
 }

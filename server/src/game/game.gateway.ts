@@ -5,6 +5,7 @@ import { RoomService } from "@app/room/room.service";
 import { AuthService } from "@app/auth/auth.service";
 import { UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
+import { UserService } from "@app/user/user.service";
 
 export interface ExtendedSocket extends Socket {
   decoded: any
@@ -17,7 +18,8 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   constructor(
     private roomService: RoomService,
     private authService: AuthService,
-    private jwtService: JwtService
+    private jwtService: JwtService,
+    private userService: UserService
   )
   {
   }
@@ -33,10 +35,11 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     // Call initializers to set up socket
     try {
       const verified = await this.jwtService.verifyAsync(client.handshake.headers.authorization, { secret: process.env.JWT_SECRET });
-      const decoded = await this.authService.decode(client.handshake.headers.authorization)
+      const decoded = await this.authService.decode(client.handshake.headers.authorization) as {id: number}
     if (verified) {
       client.decoded = decoded;
-      console.log(`client ${client.id} connected`)
+      const updated = await this.userService.updateUserConnection(client.id, decoded.id);
+      console.log(`client ${client.id} connected, connection ${updated.connection} recorded`)
     } else {
       this.handleDisconnect(client);
     }
@@ -46,10 +49,11 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
   }
 
-  async handleDisconnect(client: Socket): Promise<void>
+  async handleDisconnect(client: ExtendedSocket): Promise<void>
   {
     // Handle termination of socket
     this.roomService.terminateSocket(client)
+    const updated = await this.userService.updateUserConnection(null, client.decoded.id);
     console.log(`client ${client.id} discconnected`)
     client.disconnect();
   }
@@ -68,9 +72,9 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   }
 
   @SubscribeMessage("client.room.create")
-  onRoomCreate(client: ExtendedSocket)
+  async onRoomCreate(client: ExtendedSocket)
   {
-    const room = this.roomService.startRoom();
+    const room = await this.roomService.startRoom(client);
     room.addClient(client);
 
     return {
