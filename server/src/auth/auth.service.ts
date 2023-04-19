@@ -29,7 +29,7 @@ export class AuthService {
     async fake_login(id)
     {
         const fake_user = await this.userService.findUser(Number(id));
-        console.log(fake_user);
+        (fake_user);
         if (fake_user) {
             const payload = { id: fake_user.internal_id, name: fake_user.nickname};
         return {

@@ -16,7 +16,7 @@ export default class SocketManager
     {
         this.socket = io('http://localhost:3000', {
             autoConnect: false,
-            extraHeaders: {
+            auth: {
                 "authorization": sessionStorage.getItem('token') ?? 'not authorized'
             },
             path: '/wsapi',
@@ -25,6 +25,11 @@ export default class SocketManager
 
         this.onConnect()
         this.onDisconnect()
+    }
+
+    authorize(token: string)
+    {
+        this.socket.auth = {'authorization': token};
     }
 
     emit<T>(options: EmitOptions<T>): this
@@ -56,7 +61,6 @@ export default class SocketManager
     private onDisconnect(): void
     {
         this.socket.on('disconnect', async (reason: Socket.DisconnectReason) => {
-            console.log(reason);
 
             this.setSocketState((state) => {
                 return {...state, connected: false}

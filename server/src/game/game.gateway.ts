@@ -34,12 +34,11 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   {
     // Call initializers to set up socket
     try {
-      const verified = await this.jwtService.verifyAsync(client.handshake.headers.authorization, { secret: process.env.JWT_SECRET });
-      const decoded = await this.authService.decode(client.handshake.headers.authorization) as {id: number}
+      const verified = await this.jwtService.verifyAsync(client.handshake.auth.authorization, { secret: process.env.JWT_SECRET });
+      const decoded = await this.authService.decode(client.handshake.auth.authorization) as {id: number}
     if (verified) {
       client.decoded = decoded;
       const updated = await this.userService.updateUserConnection(client.id, decoded.id);
-      console.log(`client ${client.id} connected, connection ${updated.connection} recorded`)
     } else {
       this.handleDisconnect(client);
     }
@@ -53,8 +52,9 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   {
     // Handle termination of socket
     this.roomService.terminateSocket(client)
+    if (client.decoded) {
     const updated = await this.userService.updateUserConnection(null, client.decoded.id);
-    console.log(`client ${client.id} discconnected`)
+    }
     client.disconnect();
   }
 
@@ -62,7 +62,6 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   onRoomList()
   {
     const rooms = this.roomService.listRooms()
-    console.log(rooms)
     return {
       event: 'server.room.list',
       data: {
@@ -89,7 +88,6 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   @SubscribeMessage("client.room.join")
   onRoomJoin(client: ExtendedSocket, data: string)
   {
-    console.log(client.decoded);
     this.roomService.joinRoom(data, client)
   }
 }

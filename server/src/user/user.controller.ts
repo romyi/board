@@ -19,7 +19,6 @@ export class UserController
     async ShowOnline(@Req() req: Request & {user: any})
     {
         const users = await this.userService.getOnlineUsers(req.user.id);
-        console.log(users);
         return users;
     }
 }

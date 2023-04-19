@@ -15,11 +15,9 @@ export class Room
 
     public addClient(client: ExtendedSocket): void
     {
-        console.log(client.decoded.id), Boolean(this.heroes.has(client.decoded.id));
         if (Boolean(this.heroes.has(client.decoded.id)) === false && this.heroes.entries.length < this.maxHeroes) {
             client.join(this.id);
             this.heroes.set(client.decoded.id, client.decoded);
-            console.log(client.id, 'joined')
         }
     }
 

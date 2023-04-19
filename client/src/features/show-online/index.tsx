@@ -16,9 +16,8 @@ export const OnlineList = () => {
         .catch(),
   });
   useEffect(() => sm.onMessage("connection", () => refetch()), []);
-  console.log(data);
   return (
-    <div>
+    <div className="h-[100px] flex flex-wrap flex-col">
       {data?.map((user: any) => (
         <div key={user.id}>
           <h2>{user.id}</h2>

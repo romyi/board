@@ -1,6 +1,4 @@
 import { AuthList, Notification, RoomCreate, UserStats } from "@features/index";
-import svg_path from "./card_basic.svg";
-import { OnlineList } from "@features/show-online";
 
 export const Intro = () => {
   return (
@@ -9,7 +7,6 @@ export const Intro = () => {
         <>
           <Notification />
           <UserStats />
-          <OnlineList />
           <RoomCreate />
         </>
       )}

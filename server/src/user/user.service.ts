@@ -31,7 +31,6 @@ export class UserService
     async getOnlineUsers(user_id)
     {
         const data = await this.prisma.user.findMany({where: { connection: { not: null }, id: { not: user_id } }})
-        console.log('data', data);
         return data;
     }
 }

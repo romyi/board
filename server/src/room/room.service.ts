@@ -25,7 +25,6 @@ export class RoomService {
     {
         let room = new Room(this.server, 4);
         this.rooms.set(room.id, room);
-        console.log(client.decoded.id);
         await this.prisma.user.update({ where: {id: client.decoded.id }, data: { room: room.id }})
         return room;
     }
@@ -33,8 +32,6 @@ export class RoomService {
     public joinRoom(roomId: string, client: ExtendedSocket): void
     {
         const requestedRoom = this.rooms.get(this.rooms.entries().next().value[0])
-        // console.log('requested for join', requestedRoom)
-        // console.log(requestedRoom);
         requestedRoom.addClient(client);
     }
 }
