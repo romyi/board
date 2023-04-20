@@ -4,11 +4,10 @@ import { LOBBYING } from "@shared/messages";
 
 export const useInvite = () => {
   const { sm } = useSocketManager();
-  const invite = useCallback((user_id: string) => {
-    console.log("fire");
+  const invite = useCallback((connection_id: string) => {
     sm.emit({
       event: LOBBYING.init_invitation,
-      data: user_id,
+      data: connection_id,
     });
   }, []);
   return { invite };

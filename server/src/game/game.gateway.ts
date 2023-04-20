@@ -3,7 +3,6 @@ import { Server, Socket } from 'socket.io';
 import { SubscribeMessage } from '@nestjs/websockets';
 import { RoomService } from "@app/room/room.service";
 import { AuthService } from "@app/auth/auth.service";
-import { UnauthorizedException } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { UserService } from "@app/user/user.service";
 
@@ -32,6 +31,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   async handleConnection(client: ExtendedSocket, ...args: any[]): Promise<void>
   {
+    console.log('connected')
     // Call initializers to set up socket
     try {
       const verified = await this.jwtService.verifyAsync(client.handshake.auth.authorization, { secret: process.env.JWT_SECRET });
@@ -50,6 +50,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   async handleDisconnect(client: ExtendedSocket): Promise<void>
   {
+    console.log('disconnect')
     // Handle termination of socket
     this.roomService.terminateSocket(client)
     if (client.decoded) {
@@ -58,9 +59,16 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     client.disconnect();
   }
 
+  @SubscribeMessage("client.invite.to.room")
+  onInitInvitation(client: ExtendedSocket, rest)
+  { 
+     client.to(rest).emit('invitation',`invited by ${client.decoded.id}`)
+  }
+
   @SubscribeMessage("client.room.list")
   onRoomList()
   {
+    console.log('list')
     const rooms = this.roomService.listRooms()
     return {
       event: 'server.room.list',

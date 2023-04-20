@@ -24,7 +24,7 @@ export const OnlineList = () => {
         <div key={user.id}>
           <div className="flex gap-2">
             <h2>{user.id}</h2>
-            <button onClick={() => invite(String(user.id))}>+</button>
+            <button onClick={() => invite(String(user.connection))}>+</button>
           </div>
         </div>
       ))}
