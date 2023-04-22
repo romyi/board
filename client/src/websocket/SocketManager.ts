@@ -68,7 +68,7 @@ export default class SocketManager
         })
     }
 
-    onMessage(type: string, callback: () => void): void
+    onMessage(type: string, callback: (payload: any) => void): void
     {
         this.socket.on(type, callback)
     }

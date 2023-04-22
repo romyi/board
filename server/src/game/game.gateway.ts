@@ -62,7 +62,10 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   @SubscribeMessage("client.invite.to.room")
   onInitInvitation(client: ExtendedSocket, rest)
   { 
-     client.to(rest).emit('invitation',`invited by ${client.decoded.id}`)
+     client.to(rest).emit('invitation', {
+      id: client.decoded.id,
+      name: client.decoded.name
+     })
   }
 
   @SubscribeMessage("client.room.list")
