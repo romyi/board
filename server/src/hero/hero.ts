@@ -1,4 +1,3 @@
-import { Room } from '@app/room/room';
 import { Socket } from 'socket.io';
 import { v4 } from 'uuid';
 
