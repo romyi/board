@@ -23,7 +23,7 @@ export class CustomStrategy extends PassportStrategy(Strategy)
         if (typeof temp_code === 'string' && typeof user_id === 'string') {
             const check: boolean = this.codeService.check(user_id, temp_code);
             if (check) {
-                const user = await this.userService.findUser(Number(user_id));
+                const user = await this.userService.findTelegramUser(Number(user_id));
                 return user;
             }
             throw new UnauthorizedException()

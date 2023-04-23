@@ -28,7 +28,7 @@ export class AuthService {
 
     async fake_login(id)
     {
-        const fake_user = await this.userService.findUser(Number(id));
+        const fake_user = await this.userService.findTelegramUser(Number(id));
         (fake_user);
         if (fake_user) {
             const payload = { id: fake_user.internal_id, name: fake_user.nickname};

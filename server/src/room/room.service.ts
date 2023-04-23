@@ -18,6 +18,7 @@ export class RoomService {
     }
 
     public listRooms(): Map<Room['id'], Room> {
+        console.log(this.rooms)
         return this.rooms
     }
 
@@ -26,12 +27,31 @@ export class RoomService {
         let room = new Room(this.server, 4);
         this.rooms.set(room.id, room);
         await this.prisma.user.update({ where: {id: client.decoded.id }, data: { room: room.id }})
+        client.join(room.id)
         return room;
     }
 
-    public joinRoom(roomId: string, client: ExtendedSocket): void
+    public async joinRoom(roomId: string, client: ExtendedSocket)
+    // {
+    //     const requestedRoom = this.rooms.get(this.rooms.entries().next().value[0])
+    //     if (requestedRoom) {
+    //         // requestedRoom.addClient(client);
+    //         console.log(client.decoded.id + ' joined ' + roomId)
+    //     } else {
+    //         console.log('no room ', roomId)
+    //     }
+    // }
     {
-        const requestedRoom = this.rooms.get(this.rooms.entries().next().value[0])
-        requestedRoom.addClient(client);
+        console.log(`room id ${roomId} is wanted to join to`)
+        const room = this.rooms.get(roomId);
+        if (room) {
+            console.log(client.decoded.id + ' joined ' + roomId);
+            await this.prisma.user.update({ where: {id: client.decoded.id }, data: { room: room.id }})
+            client.join(room.id)
+            return true;
+        } else {
+            console.log('no room ', roomId)
+            return false;
+        }
     }
 }

@@ -20,7 +20,7 @@ export class BotUpdate
     async start(@Ctx() ctx: CustomContext)
     {
         const { id } = await ctx.getChat();
-        const user = await this.userService.findUser(id);
+        const user = await this.userService.findTelegramUser(id);
         if (user === null) {
             await ctx.reply("Hey! Seems like you first time here. type /login to enter");
         }

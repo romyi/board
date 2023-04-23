@@ -31,14 +31,20 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   async handleConnection(client: ExtendedSocket, ...args: any[]): Promise<void>
   {
-    console.log('connected')
     // Call initializers to set up socket
     try {
-      const verified = await this.jwtService.verifyAsync(client.handshake.auth.authorization, { secret: process.env.JWT_SECRET });
-      const decoded = await this.authService.decode(client.handshake.auth.authorization) as {id: number}
-    if (verified) {
+      const decoded = await this.jwtService.verifyAsync(client.handshake.auth.authorization, { secret: process.env.JWT_SECRET });
+      // const decoded = await this.authService.decode(client.handshake.auth.authorization) as {id: number}
+    if (decoded) {
       client.decoded = decoded;
-      const updated = await this.userService.updateUserConnection(client.id, decoded.id);
+      client.join(String(decoded.id))
+      const updated = await this.userService.updateUserConnection(String(client.decoded.id), decoded.id);
+      if (updated.room) {
+        const joined = await this.roomService.joinRoom(updated.room, client)
+        if (!joined) {
+          await this.userService.updateUser({ room: null }, decoded.id)
+        }
+      }
     } else {
       this.handleDisconnect(client);
     }
@@ -50,7 +56,6 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   async handleDisconnect(client: ExtendedSocket): Promise<void>
   {
-    console.log('disconnect')
     // Handle termination of socket
     this.roomService.terminateSocket(client)
     if (client.decoded) {
@@ -58,14 +63,26 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
     client.disconnect();
   }
-
+ 
   @SubscribeMessage("client.invite.to.room")
-  onInitInvitation(client: ExtendedSocket, rest)
+  async onInitInvitation(client: ExtendedSocket, rest)
   { 
-     client.to(rest).emit('invitation', {
+      const room = await this.roomService.startRoom(client);
+      client.to(rest).emit('invitation', {
       id: client.decoded.id,
-      name: client.decoded.name
+      name: client.decoded.name,
+      room: room.id
      })
+  }
+
+  @SubscribeMessage("confirm.invite")
+  async onConfirmInvite(client: ExtendedSocket, room_id: string)
+  {
+    const joined = await this.roomService.joinRoom(room_id, client);
+    if (joined) {
+      client.to(room_id).emit('room.joined', `${client.decoded.id} joined`)
+    }
+    console.log(client.decoded.id);
   }
 
   @SubscribeMessage("client.room.list")

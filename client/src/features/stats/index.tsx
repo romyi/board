@@ -20,7 +20,7 @@ export const UserStats = () => {
       {isLoading && <p>...</p>}
       {data && (
         <>
-          <Lottie animationData={blob_animation} loop />
+          {/* <Lottie animationData={blob_animation} loop /> */}
           <h1 className="text-[32px] text-slate-800 font-bold">{data.name}</h1>
           <div className="max-w-[300px] p-2 text-left">
             <OnlineList />

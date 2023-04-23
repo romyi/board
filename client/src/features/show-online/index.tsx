@@ -23,8 +23,8 @@ export const OnlineList = () => {
       {data?.map((user: any) => (
         <div key={user.id}>
           <div className="flex gap-2">
-            <h2>{user.id}</h2>
-            <button onClick={() => invite(String(user.connection))}>+</button>
+            <h2>{user.telegram.nickname}</h2>
+            <button onClick={() => invite(String(user.id))}>+</button>
           </div>
         </div>
       ))}

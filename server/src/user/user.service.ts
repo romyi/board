@@ -9,7 +9,14 @@ export class UserService
 
     async findUser(id: number)
     {
-        const user = await this.prisma.telegramUser.findFirst({where: {internal_id: id}})
+        const user = await this.prisma.user.findFirst({where: {id: id}})
+        if (user) return user;
+        return null
+    }
+
+    async findTelegramUser(id: number)
+    {
+        const user = await this.prisma.telegramUser.findFirst({where: { internal_id: id}})
         if (user) return user;
         return null
     }
@@ -28,9 +35,30 @@ export class UserService
         return updated
     }
 
+    async updateUser(payload: any, id: number)
+    {
+        return await this.prisma.user.update({where: { id: id}, data: payload})
+    }
+
     async getOnlineUsers(user_id)
     {
-        const data = await this.prisma.user.findMany({where: { connection: { not: null }, id: { not: user_id } }})
+        const data = await this.prisma.user.findMany({
+            where: {
+                connection: {
+                    not: null
+                },
+                id: {
+                    not: user_id
+                }
+            },
+            include: {
+                telegram: {
+                    select: {
+                        nickname: true
+                    }
+                }
+            }
+        })
         return data;
     }
 }
