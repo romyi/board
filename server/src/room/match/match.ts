@@ -1,3 +1,6 @@
+import { DoorAlignment, LootAlignment, door_deck, loots_deck } from "./configs"
+import { randomUUID } from 'crypto'
+
 class Round {
     leader: string
     index: number
@@ -5,9 +8,30 @@ class Round {
 }
 
 class Card {
-    title: string
-    id: number
     type: 'door' | 'loot'
+    title: string
+    constructor(
+        title: string,
+        type: 'door' | 'loot',
+        private readonly id: string = randomUUID()
+    ){
+        this.title = title
+        this.type = type
+    }
+}
+
+class Player {
+    constructor(
+        public name: string,
+        public rank: number = 1,
+        public sid: string,
+        public hand: Array<Card> = [],
+        public equip: Array<Card> = []
+    ){}
+
+    take_cards(deck: Deck, quantity: number) {
+        this.hand.unshift(...deck.pick(quantity));
+    }
 }
 
 class Deck {
@@ -27,7 +51,18 @@ class Deck {
     stash(cards: Array<Card>) {
         this.cards.push(...cards);
     }
-
+    fill(align: DoorAlignment | LootAlignment)
+    {
+        if (this.name !== 'stash') {
+            for (let [alias, meta] of Object.entries(align)) {
+                let i = meta.q
+                while (i > 0) {
+                    this.cards.push(new Card(alias, this.name))
+                    i --;
+                }
+            }
+        }
+    }
     constructor(name: 'door' | 'loot' | 'stash', source?: Deck)
     {
         this.source = source;
@@ -35,16 +70,19 @@ class Deck {
     }
 }
 
-class Match
+export class Match
 {
-    epoch: Round | 'free'
-    doors: Deck
-    loots: Deck
-    stash: Deck
-    constructor()
-    {
-        this.stash = new Deck('stash');
-        this.doors = new Deck('door', this.stash);
-        this.loots = new Deck('loot', this.stash);
+    constructor(
+        private readonly informer: (message: string, data: any) => void,
+        private stash: Deck = new Deck('stash'),
+        private doors: Deck = new Deck('door', stash),
+        private loots: Deck = new Deck('loot', stash),
+        public epoch: Round | 'free' = 'free',
+        public players: Array<Player>
+    ){
+        this.doors.fill(door_deck);
+        this.loots.fill(loots_deck);
+        this.inform('game state', {doors: this.doors.cards, loots:this.doors.cards})
     }
+    inform(message: string, data: any) { this.informer(message, data) }
 }
