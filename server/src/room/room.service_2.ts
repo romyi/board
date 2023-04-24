@@ -40,4 +40,11 @@ export class RoomService_2
         client.rooms.forEach((id) => this.rooms.get(id)?.kick(client));
 
     }
+
+    public find(id: string)
+    {
+        const room = this.rooms.get(id);
+        if (room) return {name: room.name, players: room.list_players()};
+        return null;
+    }
 }

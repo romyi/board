@@ -1,6 +1,7 @@
 import { SetterOrUpdater } from "recoil";
 import { io, Socket } from "socket.io-client";
 import { SocketState } from "./SocketState";
+import { QueryClient } from "@tanstack/react-query";
 
 type EmitOptions<T> = {
     event: string,
@@ -11,7 +12,7 @@ export default class SocketManager
 {
     public readonly socket: Socket;
     public setSocketState: SetterOrUpdater<SocketState>;
-
+    public queryClient: QueryClient;
     constructor()
     {
         this.socket = io('http://localhost:3000', {
@@ -25,6 +26,11 @@ export default class SocketManager
 
         this.onConnect()
         this.onDisconnect()
+
+        this.onMessage("room.join", (payload) => {
+            const { query } = payload;
+            this.queryClient.invalidateQueries([query])
+        })
     }
 
     authorize(token: string)

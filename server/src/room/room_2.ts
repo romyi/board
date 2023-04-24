@@ -24,13 +24,14 @@ export class Room
     {
         this.clients.set(player.decoded.id, player);
         player.join(this.channel);
-        this.inform('room.join', { player: player.decoded.name })
+        this.inform('room.join', { query: "room" })
     }
 
     kick(player: ExtendedSocket)
     {
         this.clients.delete(player.decoded.id)
         player.leave(this.channel)
+        this.inform('room.join', { query: "room" })
     }
 
     list_players()
