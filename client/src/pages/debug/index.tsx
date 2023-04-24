@@ -11,11 +11,6 @@ export const Debug = () => {
       event: name,
     });
   };
-  const onCreate = () => {
-    sm.emit({
-      event: "client.room.create",
-    });
-  };
   const onList = () => {
     sm.emit({
       event: "client.room.list",
@@ -24,7 +19,6 @@ export const Debug = () => {
   return (
     <div className="bg-slate-100 m-auto max-w-[800px] p-4 flex flex-col gap-3">
       <button onClick={onConnect}>connect</button>
-      <button onClick={onCreate}>create</button>
       <button onClick={() => handleMessage("client.room.join")}>join</button>
       <button onClick={onList}>list</button>
     </div>

@@ -60,7 +60,6 @@ export default class SocketManager
             this.setSocketState((state) => {
                 return {...state, connected: true}
             })
-            // this.emit({event: 'client.room.create'})
         })
     }
 

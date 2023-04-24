@@ -80,36 +80,18 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   {
     const joined = await this.roomService.join(room_id, client);
     if (joined) {
-      client.to(room_id).emit('room.joined', `${client.decoded.id} joined`)
+      client.in(room_id).emit('room.joined', {id: joined.id})
     }
     console.log(client.decoded.id);
   }
 
-  // @SubscribeMessage("client.room.list")
-  // onRoomList()
-  // {
-  //   console.log('list')
-  //   const rooms = this.roomService.listRooms()
-  //   return {
-  //     event: 'server.room.list',
-  //     data: {
-  //       message: rooms.keys().next().value
-  //     }
-  //   }
-  // }
-
-  @SubscribeMessage("client.room.create")
-  async onRoomCreate(client: ExtendedSocket)
+  @SubscribeMessage("start.match")
+  async onStart(client: ExtendedSocket, payload: {room_id: string})
   {
-    const room = await this.roomService.create(client);
-    // room.addClient(client);
-
-    return {
-      event: 'server.game.message',
-      data: {
-        message: 'room created',
-        id: room.id
-      }
+    const room_to_start = this.roomService.find(payload.room_id);
+    if (room_to_start) {
+      console.log('room found')
+      room_to_start.start_match()
     }
   }
 

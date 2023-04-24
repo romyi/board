@@ -8,10 +8,12 @@ import { ExtendedSocket } from "@app/game/game.gateway";
 export class RoomService_2
 {
     public server: Server;
-    private readonly rooms: Map<Room['id'], Room> = new Map();
+    private readonly rooms: Map<Room['id'], Room>
     constructor(
         private prisma: PrismaService,
-    ) {}
+    ) {
+        this.rooms = new Map();
+    }
 
     public async create(client: ExtendedSocket)
     {
@@ -44,7 +46,10 @@ export class RoomService_2
     public find(id: string)
     {
         const room = this.rooms.get(id);
-        if (room) return {name: room.name, players: room.list_players()};
-        return null;
+        if (room) {
+            return room
+        } else {
+            return null;
+        }
     }
 }

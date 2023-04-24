@@ -1,24 +1,28 @@
 import { ExtendedSocket } from '@app/game/game.gateway';
 import { Server } from 'socket.io';
 import { v4 } from 'uuid';
+import { Match } from './match/match';
 
 export class Room
 {
     public name: string
-    private readonly channel: string
+    protected readonly channel: string
+    public match: Match
+    server: Server
     constructor(
         initiator: ExtendedSocket,
-        private readonly server: Server,
+        server: Server,
         public readonly id: string = v4(),
         private clients: Map<string, ExtendedSocket> = new Map(),
-        private game: boolean = false
     ) {
+        this.server = server
         this.name = id;
         this.channel = id;
         this.append(initiator);
     }
 
-    inform(message: string, data: any) { this.server.to(this.channel).emit(message, data) }
+    inform(message: string, data: any ) { this.server.to(this.channel).emit(message, data) }
+    carried_inform(server: Server, channel: string){return function(message: string, data: any) {server.to(channel).emit(message, data)}}
 
     append(player: ExtendedSocket)
     {
@@ -34,19 +38,24 @@ export class Room
         this.inform('room.join', { query: "room" })
     }
 
+    //
+    // warning = doesnt work
+    //
     list_players()
     {
         let players = []
-        for (let player in this.clients.entries())
+        for (let [k, v] of this.clients)
         {
-            players.push(player[1])
+            players.push(v)
         }
+        console.log('players', players)
         return players;
     }
 
     start_match()
     {
-        this.game = true
+        console.log('match is being created')
+        this.match = new Match(this.carried_inform(this.server, this.channel), this.list_players())
         this.inform('room.game.start', {})
     }
 }

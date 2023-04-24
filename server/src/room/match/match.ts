@@ -37,7 +37,7 @@ class Player {
 class Deck {
     source: Deck
     name: 'door' | 'loot' | 'stash'
-    cards: Array<Card>
+    cards: Array<Card> = []
     pick(quantity: number) {
         if (this.cards.length > quantity) {
             return this.cards.splice(this.cards.length - quantity, quantity)
@@ -72,17 +72,24 @@ class Deck {
 
 export class Match
 {
+    private readonly stash: Deck
+    private readonly doors: Deck
+    private readonly loots: Deck
+    public epoch: Round | 'free' = 'free'
+    private readonly informer: Function
     constructor(
-        private readonly informer: (message: string, data: any) => void,
-        private stash: Deck = new Deck('stash'),
-        private doors: Deck = new Deck('door', stash),
-        private loots: Deck = new Deck('loot', stash),
-        public epoch: Round | 'free' = 'free',
+        informer: Function,
         public players: Array<Player>
     ){
+        this.informer = informer;
+        this.stash = new Deck('stash');
+        this.doors = new Deck('door', this.stash)
+        this.loots = new Deck('loot', this.stash)
+        this.epoch = 'free'
         this.doors.fill(door_deck);
         this.loots.fill(loots_deck);
-        this.inform('game state', {doors: this.doors.cards, loots:this.doors.cards})
+        this.inform('game state', {doors: this.doors.cards, loots:this.doors.cards, players: this.players})
+        console.log('state', {doors: this.doors.cards, loots:this.loots.cards, players: this.players})
     }
     inform(message: string, data: any) { this.informer(message, data) }
 }
