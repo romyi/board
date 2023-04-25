@@ -43,13 +43,18 @@ export class Room
     //
     list_players()
     {
+        console.log(this.clients);
         let players = []
-        for (let [k, v] of this.clients)
-        {
-            players.push(v)
-        }
-        console.log('players', players)
+        this.clients.forEach((value, key) => {
+            players.push(value.decoded);
+        })
         return players;
+        // for (let [k, v] of this.clients)
+        // {
+        //     players.push(v)
+        // }
+        // console.log('players', players)
+        // return players;
     }
 
     start_match()

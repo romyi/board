@@ -1,3 +1,4 @@
+import { ExtendedSocket } from "@app/game/game.gateway"
 import { DoorAlignment, LootAlignment, door_deck, loots_deck } from "./configs"
 import { randomUUID } from 'crypto'
 
@@ -21,13 +22,17 @@ class Card {
 }
 
 class Player {
+    public rank: number
+    public hand: Array<Card>
+    public equip: Array<Card>
     constructor(
         public name: string,
-        public rank: number = 1,
-        public sid: string,
-        public hand: Array<Card> = [],
-        public equip: Array<Card> = []
-    ){}
+        public sid: string
+    ){
+        this.rank = 1;
+        this.hand = [];
+        this.equip = [];
+    }
 
     take_cards(deck: Deck, quantity: number) {
         this.hand.unshift(...deck.pick(quantity));
@@ -76,11 +81,15 @@ export class Match
     private readonly doors: Deck
     private readonly loots: Deck
     public epoch: Round | 'free' = 'free'
+    public players: Array<Player> = []
     private readonly informer: Function
     constructor(
         informer: Function,
-        public players: Array<Player>
+        players: Array<ExtendedSocket['decoded']>
     ){
+        players.forEach((extended) => {
+            this.players.push( new Player(extended.name, String(extended.id)) )
+        })
         this.informer = informer;
         this.stash = new Deck('stash');
         this.doors = new Deck('door', this.stash)
