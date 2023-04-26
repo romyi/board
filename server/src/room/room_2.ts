@@ -3,6 +3,10 @@ import { Server } from 'socket.io';
 import { v4 } from 'uuid';
 import { Match } from './match/match';
 
+interface PlayingSocket extends ExtendedSocket {
+    status: 'idle' | 'ready' | 'playing'
+} 
+
 export class Room
 {
     public name: string
@@ -13,7 +17,7 @@ export class Room
         initiator: ExtendedSocket,
         server: Server,
         public readonly id: string = v4(),
-        private clients: Map<string, ExtendedSocket> = new Map(),
+        private clients: Map<string, PlayingSocket> = new Map(),
     ) {
         this.server = server
         this.name = id;
@@ -26,40 +30,32 @@ export class Room
 
     append(player: ExtendedSocket)
     {
-        this.clients.set(player.decoded.id, player);
+        player['status'] = 'idle'
+        this.clients.set(player.decoded.id, player as unknown as PlayingSocket);
         player.join(this.channel);
-        this.inform('room.join', { query: "room" })
+        // this.inform('room.join', { query: "room" })
+        console.log(player.decoded.id, ' joins room ', this.id);
+        console.log(this.clients.size)
     }
 
     kick(player: ExtendedSocket)
     {
         this.clients.delete(player.decoded.id)
         player.leave(this.channel)
-        this.inform('room.join', { query: "room" })
+        console.log(player.decoded.id, ' leaves room ', this.id);
     }
 
-    //
-    // warning = doesnt work
-    //
     list_players()
     {
-        console.log(this.clients);
         let players = []
-        this.clients.forEach((value, key) => {
-            players.push(value.decoded);
+        this.clients.forEach((value) => {
+            players.push({...value.decoded, status: value.status});
         })
         return players;
-        // for (let [k, v] of this.clients)
-        // {
-        //     players.push(v)
-        // }
-        // console.log('players', players)
-        // return players;
     }
 
     start_match()
     {
-        console.log('match is being created')
         this.match = new Match(this.carried_inform(this.server, this.channel), this.list_players())
         this.inform('room.game.start', {})
     }

@@ -27,10 +27,10 @@ export default class SocketManager
         this.onConnect()
         this.onDisconnect()
 
-        this.onMessage("room.join", (payload) => {
-            const { query } = payload;
-            this.queryClient.invalidateQueries([query])
-        })
+        // this.onMessage("room.join", (payload) => {
+        //     const { query } = payload;
+        //     this.queryClient.invalidateQueries([query])
+        // })
     }
 
     authorize(token: string)

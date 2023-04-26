@@ -8,7 +8,7 @@ import { ExtendedSocket } from "@app/game/game.gateway";
 export class RoomService_2
 {
     public server: Server;
-    private readonly rooms: Map<Room['id'], Room>
+    readonly rooms: Map<Room['id'], Room>
     constructor(
         private prisma: PrismaService,
     ) {
@@ -19,7 +19,6 @@ export class RoomService_2
     {
         const created_room = new Room(client, this.server);
         this.rooms.set(created_room.id, created_room);
-        // move to game_gateway
         await this.prisma.user.update({ where: {id: client.decoded.id }, data: { room: created_room.id }})
         return created_room;
     }
@@ -29,7 +28,6 @@ export class RoomService_2
         const wanted_room = this.rooms.get(room_id);
         if (wanted_room) {
             wanted_room.append(client);
-            // move to game_gateway
             await this.prisma.user.update({ where: {id: client.decoded.id }, data: { room: wanted_room.id }})
             return wanted_room
         } else {
@@ -39,6 +37,8 @@ export class RoomService_2
 
     public erase_player(client: ExtendedSocket)
     {
+        console.log('earsing3')
+        console.log(client.rooms)
         client.rooms.forEach((id) => this.rooms.get(id)?.kick(client));
 
     }

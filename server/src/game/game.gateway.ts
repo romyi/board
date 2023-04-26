@@ -25,34 +25,35 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   afterInit(server: Server): any
   {
-    // Pass server instance to managers
     this.roomService.server = server;
   }
 
   async handleConnection(client: ExtendedSocket, ...args: any[]): Promise<void>
   {
-    // Call initializers to set up socket
+    console.log('active rooms: ', this.roomService.rooms.size)
     try {
       const decoded = await this.jwtService.verifyAsync(client.handshake.auth.authorization, { secret: process.env.JWT_SECRET });
-      // const decoded = await this.authService.decode(client.handshake.auth.authorization) as {id: number}
-    if (decoded) {
-      client.decoded = decoded;
-      client.join(String(decoded.id))
-      const updated = await this.userService.updateUserConnection(String(client.decoded.id), decoded.id);
-      if (updated.room) {
-        const joined = await this.roomService.join(updated.room, client)
-        if (!joined) {
-          await this.userService.updateUser({ room: null }, decoded.id)
+      if (decoded) {
+        client.decoded = decoded;
+        client.join(String(decoded.id))
+        const updated = await this.userService.updateUserConnection(String(client.decoded.id), decoded.id);
+        if (updated.room) {
+          const joined = await this.roomService.join(updated.room, client)
+          if (joined) {
+            const state = {id: joined.id, parts: joined.list_players()}
+            client.emit('room.state', state)
+          }
+          if (!joined) {
+            await this.userService.updateUser({ room: null }, decoded.id)
+          }
         }
+      } else {
+        this.handleDisconnect(client);
       }
-    } else {
-      this.handleDisconnect(client);
-    }
-      
-    } catch {
-      this.handleDisconnect(client);
-    }
+  } catch {
+    this.handleDisconnect(client);
   }
+}
 
   async handleDisconnect(client: ExtendedSocket): Promise<void>
   {
@@ -80,7 +81,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       id: client.decoded.id,
       name: client.decoded.name,
       room: id
-    })
+    });
   }
 
   @SubscribeMessage("confirm.invite")
@@ -88,9 +89,10 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   {
     const joined = await this.roomService.join(room_id, client);
     if (joined) {
-      client.in(room_id).emit('room.joined', {id: joined.id})
+      const state = {id: joined.id, parts: joined.list_players()}
+      client.in(room_id).emit('room.state', state)
+      client.emit('room.state', state)
     }
-    console.log(client.decoded.id);
   }
 
   @SubscribeMessage("start.match")
@@ -98,14 +100,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   {
     const room_to_start = this.roomService.find(payload.room_id);
     if (room_to_start) {
-      console.log('room found')
       room_to_start.start_match()
     }
-  }
-
-  @SubscribeMessage("client.room.join")
-  onRoomJoin(client: ExtendedSocket, data: string)
-  {
-    this.roomService.join(data, client)
   }
 }

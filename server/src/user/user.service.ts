@@ -31,6 +31,7 @@ export class UserService
     }
 
     async updateUserConnection(connection_id, user_id) {
+        console.log('user connection updating')
         const updated = await this.prisma.user.update<Prisma.UserUpdateArgs>({ where: {id: user_id}, data: {connection: connection_id}})
         return updated
     }

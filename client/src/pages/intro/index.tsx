@@ -2,18 +2,20 @@ import {
   AuthList,
   Notification,
   Notifications,
-  RoomCreate,
+  Meta,
   UserStats,
 } from "@features/index";
+import { OnlineList } from "@features/show-online";
 
 export const Intro = () => {
   return (
-    <main className="max-w-[800px] m-auto h-screen">
+    <main className="max-w-[800px] m-auto h-screen flex flex-col items-center justify-center">
       {sessionStorage.getItem("token") && (
         <>
           <Notifications />
           <UserStats />
-          <RoomCreate />
+          <OnlineList />
+          <Meta />
         </>
       )}
       {!Boolean(sessionStorage.getItem("token")) && <AuthList />}
