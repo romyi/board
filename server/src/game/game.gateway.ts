@@ -65,14 +65,22 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   }
  
   @SubscribeMessage("client.invite.to.room")
-  async onInitInvitation(client: ExtendedSocket, rest)
+  async onInitInvitation(client: ExtendedSocket, guest: string)
   { 
-      const room = await this.roomService.create(client);
-      client.to(rest).emit('invitation', {
+    let id = null;
+    const user = await this.userService.findUser(client.decoded.id);
+    if (user.room) {
+      const {room: existing_room_id} = user;
+      const room_in_service = this.roomService.find(existing_room_id);
+      id = room_in_service.id ?? (await this.roomService.create(client)).id
+    } else {
+      id = (await this.roomService.create(client)).id
+    }
+    client.to(guest).emit('invitation', {
       id: client.decoded.id,
       name: client.decoded.name,
-      room: room.id
-     })
+      room: id
+    })
   }
 
   @SubscribeMessage("confirm.invite")

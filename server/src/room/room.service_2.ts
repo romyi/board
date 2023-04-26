@@ -49,7 +49,7 @@ export class RoomService_2
         if (room) {
             return room
         } else {
-            return null;
+            return undefined;
         }
     }
 }
