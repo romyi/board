@@ -43,6 +43,7 @@ export class Room
         this.clients.delete(player.decoded.id)
         player.leave(this.channel)
         console.log(player.decoded.id, ' leaves room ', this.id);
+        return this.clients.size === 0
     }
 
     list_players()

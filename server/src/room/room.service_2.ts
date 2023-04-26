@@ -37,10 +37,13 @@ export class RoomService_2
 
     public erase_player(client: ExtendedSocket)
     {
-        console.log('earsing3')
-        console.log(client.rooms)
-        client.rooms.forEach((id) => this.rooms.get(id)?.kick(client));
-
+        console.log('erasing')
+        this.rooms.forEach((room) => {
+            const isEmpty = room.kick(client)
+            if (isEmpty) {
+                this.rooms.delete(room.id)
+            }
+        });
     }
 
     public find(id: string)

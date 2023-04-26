@@ -27,7 +27,14 @@ export const Notification: React.FC<{
         {inform.name} call to join him in room
       </p>
       {action && actionText && (
-        <button onClick={() => action(inform.room)}>{actionText}</button>
+        <button
+          onClick={() => {
+            action(inform.room);
+            setinform(null);
+          }}
+        >
+          {actionText}
+        </button>
       )}
     </div>
   );

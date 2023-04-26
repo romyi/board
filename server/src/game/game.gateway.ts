@@ -60,7 +60,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     // Handle termination of socket
     this.roomService.erase_player(client)
     if (client.decoded) {
-    const updated = await this.userService.updateUserConnection(null, client.decoded.id);
+      await this.userService.updateUser({connection: null, room: null}, client.decoded.id);
     }
     client.disconnect();
   }
@@ -87,6 +87,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   @SubscribeMessage("confirm.invite")
   async onConfirmInvite(client: ExtendedSocket, room_id: string)
   {
+    this.roomService.erase_player(client)
     const joined = await this.roomService.join(room_id, client);
     if (joined) {
       const state = {id: joined.id, parts: joined.list_players()}
