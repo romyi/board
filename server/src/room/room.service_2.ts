@@ -37,7 +37,6 @@ export class RoomService_2
 
     public erase_player(client: ExtendedSocket)
     {
-        console.log('erasing')
         this.rooms.forEach((room) => {
             const isEmpty = room.kick(client)
             if (isEmpty) {

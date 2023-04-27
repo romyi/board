@@ -33,9 +33,6 @@ export class Room
         player['status'] = 'idle'
         this.clients.set(player.decoded.id, player as unknown as PlayingSocket);
         player.join(this.channel);
-        // this.inform('room.join', { query: "room" })
-        console.log(player.decoded.id, ' joins room ', this.id);
-        console.log(this.clients.size)
     }
 
     kick(player: ExtendedSocket)

@@ -19,9 +19,6 @@ export const UserStats = () => {
     },
   });
   useEffect(() => {
-    // sm.onMessage("room.joined", (payload) => {
-    //   sessionStorage.setItem("room", payload.id);
-    // });
     sm.onMessage("room.state", (data) => setState(data));
   }, []);
   return (
@@ -31,21 +28,6 @@ export const UserStats = () => {
         <>
           {/* <Lottie animationData={blob_animation} loop /> */}
           <h1 className="text-[32px] text-slate-800 font-bold">{data.name}</h1>
-          {/* {sessionStorage.getItem("room") && (
-            <div>
-              <h2>{sessionStorage.getItem("room")}</h2>
-              <button
-                onClick={() =>
-                  sm.emit({
-                    event: "start.match",
-                    data: { room_id: sessionStorage.getItem("room") },
-                  })
-                }
-              >
-                start
-              </button>
-            </div>
-          )} */}
         </>
       )}
       {state && (
@@ -54,6 +36,7 @@ export const UserStats = () => {
           {state.parts.map((participant: any) => {
             return <div>{participant.name}</div>;
           })}
+          <button>leave</button>
         </div>
       )}
     </div>

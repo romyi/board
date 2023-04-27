@@ -30,7 +30,6 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   async handleConnection(client: ExtendedSocket, ...args: any[]): Promise<void>
   {
-    console.log('active rooms: ', this.roomService.rooms.size)
     try {
       const decoded = await this.jwtService.verifyAsync(client.handshake.auth.authorization, { secret: process.env.JWT_SECRET });
       if (decoded) {
@@ -90,9 +89,22 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     this.roomService.erase_player(client)
     const joined = await this.roomService.join(room_id, client);
     if (joined) {
+      // cant wait to encapsulate it
       const state = {id: joined.id, parts: joined.list_players()}
       client.in(room_id).emit('room.state', state)
       client.emit('room.state', state)
+    }
+  }
+
+  @SubscribeMessage("room.leave")
+  async onLeave(client: ExtendedSocket, room_id)
+  {
+    const room = this.roomService.find(room_id);
+    if (room) {
+      room.kick(client)
+      const state = {id: room.id, parts: room.list_players()}
+      client.in(room_id).emit('room.state', state)
+      client.emit('room.state', null)
     }
   }
 

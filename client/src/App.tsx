@@ -10,12 +10,6 @@ function App() {
   const { sm } = useSocketManager();
   useEffect(() => {
     sm.connect();
-    sm.onMessage("room.state", (data) => {
-      console.log(data);
-      // if (location !== `/${data.id}`) {
-      //   setLocation(`/${data.id}`);
-      // }
-    });
   }, []);
   return (
     <Switch>

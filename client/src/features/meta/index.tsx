@@ -5,11 +5,7 @@ import { useEffect, useState } from "react";
 export const Meta = () => {
   const { sm, socket } = useSocketManager();
   const [state, setState] = useState<null | { id: string }>(null);
-  console.log(state);
   useEffect(() => {
-    // sm.onMessage("game state", (data) => {
-    //   setState(data);
-    // });
     sm.onMessage("room.state", (data) => {
       setState(data);
     });
