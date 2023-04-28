@@ -36,7 +36,11 @@ export const UserStats = () => {
           {state.parts.map((participant: any) => {
             return <div>{participant.name}</div>;
           })}
-          <button>leave</button>
+          <button
+            onClick={() => sm.emit({ event: "room.leave", data: state.id })}
+          >
+            leave
+          </button>
         </div>
       )}
     </div>

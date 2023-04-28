@@ -57,10 +57,10 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   async handleDisconnect(client: ExtendedSocket): Promise<void>
   {
     // Handle termination of socket
-    this.roomService.erase_player(client)
-    if (client.decoded) {
-      await this.userService.updateUser({connection: null, room: null}, client.decoded.id);
-    }
+    // this.roomService.erase_player(client)
+    // if (client.decoded) {
+    //   await this.userService.updateUser({connection: null, room: null}, client.decoded.id);
+    // }
     client.disconnect();
   }
  
@@ -101,10 +101,16 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   {
     const room = this.roomService.find(room_id);
     if (room) {
-      room.kick(client)
-      const state = {id: room.id, parts: room.list_players()}
-      client.in(room_id).emit('room.state', state)
-      client.emit('room.state', null)
+      const noUsersLeft = room.kick(client)
+      this.userService.updateUser({room: null}, client.decoded.id)
+      if (noUsersLeft) {
+        this.roomService.delete_room(room_id)
+        client.emit('room.state', null)
+      } else {
+        const state = {id: room.id, parts: room.list_players()}
+        client.in(room_id).emit('room.state', state)
+        client.emit('room.state', null)
+      }
     }
   }
 

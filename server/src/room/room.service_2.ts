@@ -35,6 +35,11 @@ export class RoomService_2
         }
     }
 
+    public delete_room(id: string) { 
+        this.rooms.delete(id) 
+        console.log(`room ${id} deleted, total rooms: ${this.rooms.size}`)
+    }
+
     public erase_player(client: ExtendedSocket)
     {
         this.rooms.forEach((room) => {
