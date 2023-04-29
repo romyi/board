@@ -41,6 +41,9 @@ export const UserStats = () => {
           >
             leave
           </button>
+          <button onClick={() => sm.emit({ event: "start.match" })}>
+            start
+          </button>
         </div>
       )}
     </div>

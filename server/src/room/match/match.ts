@@ -1,78 +1,13 @@
 import { ExtendedSocket } from "@app/game/game.gateway"
-import { DoorAlignment, LootAlignment, door_deck, loots_deck } from "./configs"
-import { randomUUID } from 'crypto'
+import { door_deck, loots_deck } from "./configs"
+import { Deck } from "./deck"
+import { Hero } from "./hero"
+import { Turner } from "./turner"
 
 class Round {
     leader: string
     index: number
     context: 'door' | 'skirmish' | 'death' | 'retreatment'
-}
-
-class Card {
-    type: 'door' | 'loot'
-    title: string
-    constructor(
-        title: string,
-        type: 'door' | 'loot',
-        private readonly id: string = randomUUID()
-    ){
-        this.title = title
-        this.type = type
-    }
-}
-
-class Player {
-    public rank: number
-    public hand: Array<Card>
-    public equip: Array<Card>
-    constructor(
-        public name: string,
-        public sid: string
-    ){
-        this.rank = 1;
-        this.hand = [];
-        this.equip = [];
-    }
-
-    take_cards(deck: Deck, quantity: number) {
-        this.hand.unshift(...deck.pick(quantity));
-    }
-}
-
-class Deck {
-    source: Deck
-    name: 'door' | 'loot' | 'stash'
-    cards: Array<Card> = []
-    pick(quantity: number) {
-        if (this.cards.length > quantity) {
-            return this.cards.splice(this.cards.length - quantity, quantity)
-         } else {
-            const new_cards = this.source.cards.filter(sourceCard => sourceCard.type === this.name)
-            this.cards.unshift(...new_cards);
-            this.source.cards = this.source.cards.filter(sourceCard => sourceCard.type !== this.name)
-            this.pick(quantity);
-         }
-    }
-    stash(cards: Array<Card>) {
-        this.cards.push(...cards);
-    }
-    fill(align: DoorAlignment | LootAlignment)
-    {
-        if (this.name !== 'stash') {
-            for (let [alias, meta] of Object.entries(align)) {
-                let i = meta.q
-                while (i > 0) {
-                    this.cards.push(new Card(alias, this.name))
-                    i --;
-                }
-            }
-        }
-    }
-    constructor(name: 'door' | 'loot' | 'stash', source?: Deck)
-    {
-        this.source = source;
-        this.name = name;
-    }
 }
 
 export class Match
@@ -81,14 +16,15 @@ export class Match
     private readonly doors: Deck
     private readonly loots: Deck
     public epoch: Round | 'free' = 'free'
-    public players: Array<Player> = []
+    public players: Array<Hero> = []
     private readonly informer: Function
+    public turner: Turner
     constructor(
         informer: Function,
         players: Array<ExtendedSocket['decoded']>
     ){
         players.forEach((extended) => {
-            this.players.push( new Player(extended.name, String(extended.id)) )
+            this.players.push( new Hero(extended.name, String(extended.id)) )
         })
         this.informer = informer;
         this.stash = new Deck('stash');
@@ -97,6 +33,7 @@ export class Match
         this.epoch = 'free'
         this.doors.fill(door_deck);
         this.loots.fill(loots_deck);
+        this.turner = new Turner(this.players);
         this.inform('game state', {doors: this.doors.cards, loots:this.doors.cards, players: this.players})
         console.log('state', {doors: this.doors.cards, loots:this.loots.cards, players: this.players})
     }
