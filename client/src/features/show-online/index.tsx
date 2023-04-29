@@ -12,7 +12,7 @@ export const OnlineList = () => {
     queryFn: () =>
       fetch(`http://localhost:3000/api/user/online`, {
         body: null,
-        headers: { Authorization: `Bearer ${sessionStorage.token}` },
+        headers: { Authorization: `Bearer ${localStorage.token}` },
       })
         .then((res) => res.json())
         .catch(),

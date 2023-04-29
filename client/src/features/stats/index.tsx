@@ -12,7 +12,7 @@ export const UserStats = () => {
     queryKey: ["user"],
     queryFn: async () => {
       return fetch("http://localhost:3000/api/user", {
-        headers: { Authorization: `Bearer ${sessionStorage.token}` },
+        headers: { Authorization: `Bearer ${localStorage.token}` },
       })
         .then((res) => res.json())
         .catch();
@@ -41,8 +41,17 @@ export const UserStats = () => {
           >
             leave
           </button>
-          <button onClick={() => sm.emit({ event: "start.match" })}>
+          <button
+            onClick={() => sm.emit({ event: "start.match", data: state.id })}
+          >
             start
+          </button>
+          <button
+            onClick={() =>
+              sm.emit({ event: "report.match.state", data: state.id })
+            }
+          >
+            report
           </button>
         </div>
       )}

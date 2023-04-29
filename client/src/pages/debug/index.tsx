@@ -12,6 +12,12 @@ export const Debug = () => {
   useEffect(() => {}, []);
   return (
     <main className="h-screen w-full grid grid-cols-3">
+      <div className="col-start-1 h-full col-end-2 flex flex-col-reverse p-8 gap-8 w-[200px]">
+        <article className="rounded-sm bg-cyan-100 p-4">bruh</article>
+        <article className="rounded-sm bg-cyan-100 p-4">bruh</article>
+        <article className="rounded-sm bg-cyan-100 p-4">bruh</article>
+        <article className="rounded-sm bg-cyan-100 p-4">bruh</article>
+      </div>
       <div className="col-start-2 col-end-3 flex flex-col justify-center items-center p-8">
         <motion.section
           initial="hidden"

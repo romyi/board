@@ -14,10 +14,10 @@ export class Turner {
                 this.alternative = null
             }
             if (start === this.gamers.length) { start = 0 }
-            // if (this.gamers[start].isOnline === false) {
-            //     start ++
-            //     continue;
-            // };
+            if (this.gamers[start].isOnline === false) {
+                start ++
+                continue;
+            };
             yield start++
         }
     }

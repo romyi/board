@@ -3,6 +3,7 @@ import { door_deck, loots_deck } from "./configs"
 import { Deck } from "./deck"
 import { Hero } from "./hero"
 import { Turner } from "./turner"
+import { randomUUID } from "crypto"
 
 class Round {
     leader: string
@@ -16,15 +17,17 @@ export class Match
     private readonly doors: Deck
     private readonly loots: Deck
     public epoch: Round | 'free' = 'free'
-    public players: Array<Hero> = []
+    public heroes: Array<Hero> = []
     private readonly informer: Function
     public turner: Turner
+    readonly id: string
     constructor(
         informer: Function,
-        players: Array<ExtendedSocket['decoded']>
+        heroes: Array<ExtendedSocket['decoded']>
     ){
-        players.forEach((extended) => {
-            this.players.push( new Hero(extended.name, String(extended.id)) )
+        this.id = randomUUID();
+        heroes.forEach((extended) => {
+            this.heroes.push( new Hero(extended.name, String(extended.id)) )
         })
         this.informer = informer;
         this.stash = new Deck('stash');
@@ -33,9 +36,19 @@ export class Match
         this.epoch = 'free'
         this.doors.fill(door_deck);
         this.loots.fill(loots_deck);
-        this.turner = new Turner(this.players);
-        this.inform('game state', {doors: this.doors.cards, loots:this.doors.cards, players: this.players})
-        console.log('state', {doors: this.doors.cards, loots:this.loots.cards, players: this.players})
+        this.turner = new Turner(this.heroes);
+        this.inform('game state', this.state)
     }
+    hero_inactive(disconnected_id: string) { this.heroes.find((hero) => hero.user_channel_id === String(disconnected_id)).isOnline = false }
+    hero_active(connected_id: string) { this.heroes.find((hero) => hero.user_channel_id === String(connected_id)).isOnline = true }
     inform(message: string, data: any) { this.informer(message, data) }
+    get state() {
+        return {
+            heroes: this.heroes,
+            doors: this.doors.cards.length,
+            loots: this.loots.cards.length,
+            epoch: this.epoch,
+            turn: this.turner
+        }
+    }
 }

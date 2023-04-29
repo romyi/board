@@ -49,18 +49,18 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       } else {
         this.handleDisconnect(client);
       }
-  } catch {
-    this.handleDisconnect(client);
-  }
+    } catch (error) {
+      console.log(error)
+    }
 }
 
   async handleDisconnect(client: ExtendedSocket): Promise<void>
   {
-    // Handle termination of socket
-    // this.roomService.erase_player(client)
-    // if (client.decoded) {
-    //   await this.userService.updateUser({connection: null, room: null}, client.decoded.id);
-    // }
+    console.log('disconnect', client.decoded);
+    this.roomService.erase_player(client)
+    if (client.decoded) {
+      await this.userService.updateUser({connection: null}, client.decoded.id);
+    }
     client.disconnect();
   }
  
@@ -115,11 +115,21 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   }
 
   @SubscribeMessage("start.match")
-  async onStart(client: ExtendedSocket, payload: {room_id: string})
+  async onStart(client: ExtendedSocket, room_id: string)
   {
-    const room_to_start = this.roomService.find(payload.room_id);
+    const room_to_start = this.roomService.find(room_id);
     if (room_to_start) {
       room_to_start.start_match()
     }
+  }
+
+  @SubscribeMessage("report.match.state")
+  async onGameState(client: ExtendedSocket, room_id: string)
+  {
+    console.log(client.decoded);
+    // const { room } = await this.userService.findUser(client.decoded.id);
+    const room = this.roomService.rooms.get(room_id);
+    console.log(room ? room.match.state : null)
+    client.emit("game state", room ? room.match.state : null)
   }
 }

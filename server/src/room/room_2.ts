@@ -19,7 +19,8 @@ export class Room
         public readonly id: string = v4(),
         private clients: Map<string, PlayingSocket> = new Map(),
     ) {
-        this.server = server
+        this.match = null;
+        this.server = server;
         this.name = id;
         this.channel = id;
         this.append(initiator);
@@ -32,6 +33,7 @@ export class Room
     {
         player['status'] = 'idle'
         this.clients.set(player.decoded.id, player as unknown as PlayingSocket);
+        if (this.match) { this.match.hero_active(player.decoded.id) }
         player.join(this.channel);
     }
 
@@ -39,6 +41,7 @@ export class Room
     {
         this.clients.delete(player.decoded.id)
         player.leave(this.channel)
+        if (this.match) { this.match.hero_inactive(player.decoded.id) }
         console.log(player.decoded.id, ' leaves room ', this.id);
         return this.clients.size === 0
     }
@@ -55,6 +58,7 @@ export class Room
     start_match()
     {
         this.match = new Match(this.carried_inform(this.server, this.channel), this.list_players())
-        this.inform('room.game.start', {})
+        console.log('game started')
+        // this.inform('room.game.start', {})
     }
 }

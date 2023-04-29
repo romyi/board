@@ -19,11 +19,11 @@ export const Fetcher = () => {
     onSuccess(data) {
       if (Boolean(data.access_token)) {
         sm.authorize(data.access_token);
-        sessionStorage.setItem("token", data.access_token);
+        localStorage.setItem("token", data.access_token);
         setLocation("/");
       }
     },
-    enabled: !Boolean(sessionStorage.getItem("token")),
+    enabled: !Boolean(localStorage.getItem("token")),
   });
   return (
     <div>
