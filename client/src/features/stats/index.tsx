@@ -1,12 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
-import Lottie from "lottie-react";
-import blob_animation from "./blob.lottie.json";
 import useSocketManager from "@hooks/useSocketManager";
-import { useEffect, useState } from "react";
+import { useLocation } from "wouter";
+import { useRecoilValue } from "recoil";
+import { roomState } from "@states/room";
 
 export const UserStats = () => {
   const { sm } = useSocketManager();
-  const [state, setState] = useState<null | any>(null);
+  const room = useRecoilValue(roomState);
+  const [, setLocation] = useLocation();
   const { data, isLoading } = useQuery<any, any, { name: string }, any>({
     retry: false,
     queryKey: ["user"],
@@ -18,40 +19,30 @@ export const UserStats = () => {
         .catch();
     },
   });
-  useEffect(() => {
-    sm.onMessage("room.state", (data) => setState(data));
-  }, []);
   return (
     <div className="max-w-[300px] flex flex-col justify-center text-center">
       {isLoading && <p>...</p>}
       {data && (
-        <>
-          {/* <Lottie animationData={blob_animation} loop /> */}
-          <h1 className="text-[32px] text-slate-800 font-bold">{data.name}</h1>
-        </>
+        <h1 className="text-[32px] text-slate-800 font-bold">{data.name}</h1>
       )}
-      {state && (
+      {room.id !== null && (
         <div>
-          <h3>{state.id}</h3>
-          {state.parts.map((participant: any) => {
+          <h3>{room.id}</h3>
+          {room.parts.map((participant: any) => {
             return <div>{participant.name}</div>;
           })}
           <button
-            onClick={() => sm.emit({ event: "room.leave", data: state.id })}
+            onClick={() => sm.emit({ event: "room.leave", data: room.id })}
           >
             leave
           </button>
           <button
-            onClick={() => sm.emit({ event: "start.match", data: state.id })}
+            onClick={() => sm.emit({ event: "start.match", data: room.id })}
           >
             start
           </button>
-          <button
-            onClick={() =>
-              sm.emit({ event: "report.match.state", data: state.id })
-            }
-          >
-            report
+          <button onClick={() => setLocation(`/${room.id as string}`)}>
+            play
           </button>
         </div>
       )}

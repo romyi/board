@@ -90,7 +90,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     const joined = await this.roomService.join(room_id, client);
     if (joined) {
       // cant wait to encapsulate it
-      const state = {id: joined.id, parts: joined.list_players()}
+      const state = {id: joined.id, parts: joined.list_players(), match: joined.match}
       client.in(room_id).emit('room.state', state)
       client.emit('room.state', state)
     }

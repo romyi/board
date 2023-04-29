@@ -1,19 +1,20 @@
-import { useRecoilState } from "recoil";
+import { useRecoilValue } from "recoil";
 import useSocketManager from "../../hooks/useSocketManager";
-import { useEffect, useState } from "react";
+import { roomState } from "@states/room";
+import { gameplayState } from "@states/gameplay";
 
 export const Meta = () => {
-  const { sm, socket } = useSocketManager();
-  const [state, setState] = useState<null | { id: string }>(null);
-  useEffect(() => {
-    sm.onMessage("room.state", (data) => {
-      setState(data);
-    });
-  }, []);
+  const { socket } = useSocketManager();
+  const room = useRecoilValue(roomState);
+  const gameplay = useRecoilValue(gameplayState);
+  console.log(gameplay);
   return (
     <div className="absolute bottom-1 flex gap-12">
       <p className="block">{socket.connected ? "online" : ""}</p>
-      <p className="block">{state?.id ?? ""}</p>
+      <p className="block">{room?.id ?? ""}</p>
+      {gameplay.match !== null && (
+        <p className="block">{gameplay.match?.epoch as string}</p>
+      )}
     </div>
   );
 };
