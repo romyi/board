@@ -1,5 +1,6 @@
+import { Background } from "@features/gameplay";
 import React from "react";
 
 export const Gameplay = () => {
-  return <h1>gameplay</h1>;
+  return <Background />;
 };
