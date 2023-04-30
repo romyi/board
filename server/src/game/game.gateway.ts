@@ -42,7 +42,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             const state = {id: joined.id, parts: joined.list_players()}
             client.emit('room.state', state)
             if (joined.match !== null) {
-              client.emit('game state', joined.match.state)
+              client.emit('game state', joined.match.inform())
             }
           }
           if (!joined) {
@@ -126,13 +126,22 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
   }
 
+  @SubscribeMessage("match.action")
+  async onMatchAction(client: ExtendedSocket, data: {room_id: string, action: 'round' | 'free'})
+  {
+    const room = this.roomService.find(data.room_id);
+    if (room) {
+      data.action === 'round' && room.match.start_round()
+      data.action === 'free' && room.match.start_free_epoch()
+    }
+  }
+
   @SubscribeMessage("report.match.state")
   async onGameState(client: ExtendedSocket, room_id: string)
   {
     console.log(client.decoded);
     // const { room } = await this.userService.findUser(client.decoded.id);
     const room = this.roomService.rooms.get(room_id);
-    console.log(room ? room.match.state : null)
-    client.emit("game state", room ? room.match.state : null)
+    client.emit("game state", room ? room.match.inform() : null)
   }
 }

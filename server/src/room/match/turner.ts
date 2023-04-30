@@ -1,4 +1,5 @@
 import { Hero } from "./hero";
+import { Round } from "./round";
 
 export class Turner {
     protected _alternative: number | null = null
@@ -27,7 +28,7 @@ export class Turner {
         private readonly gamers: Array<Hero>
     ) { this.gen = this.passer() }
 
-    public pass() { 
-        return this.gamers[this.gen.next().value].name 
+    public pass() {
+        return new Round(this.gamers[this.gen.next().value])
     }
 }

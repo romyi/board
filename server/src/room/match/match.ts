@@ -4,11 +4,17 @@ import { Deck } from "./deck"
 import { Hero } from "./hero"
 import { Turner } from "./turner"
 import { randomUUID } from "crypto"
+import { Round } from "./round"
 
-class Round {
-    leader: string
-    index: number
-    context: 'door' | 'skirmish' | 'death' | 'retreatment'
+function reportMatchState(target: any, propertyName: string, descriptor: PropertyDescriptor)
+{
+ const matchMethod = descriptor.value;
+ descriptor.value = function(...args: any[]) {
+    const result = matchMethod.apply(this, args);
+    this.inform();
+    console.log('decorator')
+    return result;
+ }
 }
 
 export class Match
@@ -37,18 +43,21 @@ export class Match
         this.doors.fill(door_deck);
         this.loots.fill(loots_deck);
         this.turner = new Turner(this.heroes);
-        this.inform('game state', this.state)
+        this.inform()
     }
     hero_inactive(disconnected_id: string) { this.heroes.find((hero) => hero.user_channel_id === String(disconnected_id)).isOnline = false }
     hero_active(connected_id: string) { this.heroes.find((hero) => hero.user_channel_id === String(connected_id)).isOnline = true }
-    inform(message: string, data: any) { this.informer(message, data) }
-    get state() {
-        return {
-            heroes: this.heroes,
-            doors: this.doors.cards.length,
-            loots: this.loots.cards.length,
-            epoch: this.epoch,
-            turn: this.turner
-        }
-    }
+    inform() { this.informer('game state', {
+        heroes: this.heroes,
+        doors: this.doors.cards.length,
+        loots: this.loots.cards.length,
+        epoch: this.epoch,
+        turn: this.turner
+    }) }
+    
+    @reportMatchState
+    start_round() { this.epoch = this.turner.pass() }
+    
+    @reportMatchState
+    start_free_epoch() { this.epoch = 'free' }
 }
