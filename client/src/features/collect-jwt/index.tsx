@@ -11,7 +11,9 @@ export const Fetcher = () => {
     queryKey: ["jwt"],
     queryFn: () =>
       fetch(
-        `http://localhost:3000/api/auth/telegram${window.location.search}`,
+        `http://${import.meta.env.VITE_PRIVATE_IP}:3000/api/auth/telegram${
+          window.location.search
+        }`,
         { method: "post", body: null }
       )
         .then((res) => res.json())
@@ -28,6 +30,7 @@ export const Fetcher = () => {
   return (
     <div>
       <p>...</p>
+      <p>{localStorage.getItem("token")}</p>
     </div>
   );
 };

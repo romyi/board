@@ -7,7 +7,7 @@ export const HeroesTab = () => {
   const { match } = useRecoilValue(gameplayState);
   const { client } = useRecoilValue(clientState);
   return (
-    <div className="flex gap-4 p-6">
+    <div className="flex gap-4 p-6 flex-wrap">
       {match?.heroes.map((hero) => {
         return (
           <motion.section

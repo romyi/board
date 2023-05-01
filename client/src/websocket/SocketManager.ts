@@ -15,7 +15,7 @@ export default class SocketManager
     public queryClient: QueryClient;
     constructor()
     {
-        this.socket = io('http://localhost:3000', {
+        this.socket = io(`http://${import.meta.env.VITE_PRIVATE_IP}:3000`, {
             autoConnect: false,
             auth: {
                 "authorization": localStorage.getItem('token') ?? 'not authorized'
@@ -35,6 +35,7 @@ export default class SocketManager
 
     authorize(token: string)
     {
+        console.log('token ', token)
         this.socket.auth = {'authorization': token};
     }
 

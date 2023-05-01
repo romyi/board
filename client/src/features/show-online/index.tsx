@@ -10,7 +10,7 @@ export const OnlineList = () => {
     retry: false,
     queryKey: ["online"],
     queryFn: () =>
-      fetch(`http://localhost:3000/api/user/online`, {
+      fetch(`http://${import.meta.env.VITE_PRIVATE_IP}:3000/api/user/online`, {
         body: null,
         headers: { Authorization: `Bearer ${localStorage.token}` },
       })

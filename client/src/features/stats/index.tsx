@@ -12,7 +12,7 @@ export const UserStats = () => {
     retry: false,
     queryKey: ["user"],
     queryFn: async () => {
-      return fetch("http://localhost:3000/api/user", {
+      return fetch(`http://${import.meta.env.VITE_PRIVATE_IP}:3000/api/user`, {
         headers: { Authorization: `Bearer ${localStorage.token}` },
       })
         .then((res) => res.json())

@@ -33,13 +33,13 @@ export class BotUpdate
         if (ctx.session.user) {
             ctx.sendMessage('you already logged in');
             const code = await this.codeService.generate(String(ctx.session.user.id));
-            ctx.sendMessage(`your temporary link: \nhttp://localhost:5173/tg?sec=${code}&id=${ctx.session.user.id}`);
+            ctx.sendMessage(`your temporary link: \nhttp://${process.env.PRIVATE_IP}:5173/`);
             return;
         }
         const chat = await ctx.getChat() as Chat & Chat.UserNameChat;
         const user = await this.userService.createUser({create: {id: chat.id, nickname: chat.username}})
         const code = await this.codeService.generate(String(user.id));
         ctx.session.user = {id: user.id};
-        ctx.sendMessage(`your temporary link: \nhttp://localhost:5173/tg?sec=${code}&id=${user.id}`);
+        ctx.sendMessage(`your temporary link: \nhttp://${process.env.PRIVATE_IP}:5173/tg?sec=${code}&id=${user.id}`);
     }
 }

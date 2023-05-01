@@ -60,7 +60,6 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   async handleDisconnect(client: ExtendedSocket): Promise<void>
   {
-    console.log('disconnect', client.decoded);
     this.roomService.erase_player(client)
     if (client.decoded) {
       await this.userService.updateUser({connection: null}, client.decoded.id);
