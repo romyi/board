@@ -1,18 +1,31 @@
 import { gameplayState } from "@states/gameplay";
 import { useRecoilValue } from "recoil";
-import { motion } from "framer-motion";
+import { Variants, motion } from "framer-motion";
+
+const backgroundAnimations: Variants = {
+  white: {
+    background: "white",
+  },
+  x: {
+    background:
+      "radial-gradient(59.41% 51.45% at 50% 50%, #E7FFFE 0%, #F8FFFF 73.89%)",
+    transitionDuration: "1s",
+  },
+  y: {
+    background:
+      "radial-gradient(59.41% 51.45% at 50% 50%, #FFF3FF 0%, #F8FFFF 73.89%)",
+    transitionDuration: "1s",
+  },
+};
 
 export const Background = () => {
   const gameplay = useRecoilValue(gameplayState);
-  console.log(gameplay);
   return (
     <motion.section
-      animate={{
-        background: gameplay.match?.epoch === "free" ? "#994032" : "white",
-      }}
-      transition={{ duration: 3 }}
-    >
-      background
-    </motion.section>
+      className="h-screen w-screen absolute -z-10"
+      variants={backgroundAnimations}
+      initial={"white"}
+      animate={gameplay.match?.epoch === "free" ? "x" : "y"}
+    />
   );
 };

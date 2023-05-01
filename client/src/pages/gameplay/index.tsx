@@ -1,4 +1,4 @@
-import { Background } from "@features/gameplay";
+import { Background, HeroesTab } from "@features/gameplay";
 import useSocketManager from "@hooks/useSocketManager";
 import { roomState } from "@states/room";
 import React from "react";
@@ -20,6 +20,7 @@ export const Gameplay = () => {
   return (
     <>
       <Background />
+      <HeroesTab />
       <button onClick={handleStart}>start round</button>
       <button onClick={handleEnd}>finish round</button>
     </>

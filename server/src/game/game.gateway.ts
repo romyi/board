@@ -36,13 +36,14 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         client.decoded = decoded;
         client.join(String(decoded.id))
         const updated = await this.userService.updateUserConnection(String(client.decoded.id), decoded.id);
+        client.emit('client.state', decoded)
         if (updated.room) {
           const joined = await this.roomService.join(updated.room, client)
           if (joined) {
             const state = {id: joined.id, parts: joined.list_players()}
             client.emit('room.state', state)
             if (joined.match !== null) {
-              client.emit('game state', joined.match.inform())
+              joined.match.inform()
             }
           }
           if (!joined) {

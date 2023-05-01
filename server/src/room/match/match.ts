@@ -12,7 +12,6 @@ function reportMatchState(target: any, propertyName: string, descriptor: Propert
  descriptor.value = function(...args: any[]) {
     const result = matchMethod.apply(this, args);
     this.inform();
-    console.log('decorator')
     return result;
  }
 }
@@ -45,9 +44,14 @@ export class Match
         this.turner = new Turner(this.heroes);
         this.inform()
     }
+    @reportMatchState
     hero_inactive(disconnected_id: string) { this.heroes.find((hero) => hero.user_channel_id === String(disconnected_id)).isOnline = false }
+
+    @reportMatchState
     hero_active(connected_id: string) { this.heroes.find((hero) => hero.user_channel_id === String(connected_id)).isOnline = true }
-    inform() { this.informer('game state', {
+    
+    inform() { 
+        this.informer('game state', {
         heroes: this.heroes,
         doors: this.doors.cards.length,
         loots: this.loots.cards.length,

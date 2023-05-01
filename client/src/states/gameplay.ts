@@ -5,7 +5,7 @@ type Gameplay = {
         heroes: Array<{name: string, isOnline: boolean, rank: number}>,
         doors: number,
         loots: number,
-        epoch: 'free' | unknown,
+        epoch: 'free' | {context: string, hero: any},
         turn: unknown
         } | null
 }
