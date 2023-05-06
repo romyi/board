@@ -5,7 +5,7 @@ import { AuthService } from "@app/auth/auth.service";
 import { JwtService } from "@nestjs/jwt";
 import { UserService } from "@app/user/user.service";
 import { RoomService_2 } from "@app/room/room.service_2";
-import { MatchMessages } from "@mun/shared";
+import { MatchMessages } from "@shared/index";
 
 export interface ExtendedSocket extends Socket {
   decoded: any
