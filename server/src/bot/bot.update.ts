@@ -30,14 +30,19 @@ export class BotUpdate
     @Command("login")
     async onLogin(@Ctx() ctx: CustomContext)
     {
-        if (ctx.session.user) {
-            ctx.sendMessage('you already logged in');
-            const code = await this.codeService.generate(String(ctx.session.user.id));
-            ctx.sendMessage(`your temporary link: \nhttp://${process.env.PRIVATE_IP}:5173/`);
-            return;
-        }
+        // if (ctx.session.user) {
+        //     ctx.sendMessage('you already logged in');
+        //     const code = await this.codeService.generate(String(ctx.session.user.id));
+        //     ctx.sendMessage(`your temporary link: \nhttp://${process.env.PRIVATE_IP}:5173/`);
+        //     return;
+        // }
+        let user;
         const chat = await ctx.getChat() as Chat & Chat.UserNameChat;
-        const user = await this.userService.createUser({create: {id: chat.id, nickname: chat.username}})
+        if (!ctx.session.user) {
+            user = await this.userService.createUser({create: {id: chat.id, nickname: chat.username}})
+        } else {
+            user = await this.userService.findUser(Number(ctx.session.user.id));
+        }
         const code = await this.codeService.generate(String(user.id));
         ctx.session.user = {id: user.id};
         ctx.sendMessage(`your temporary link: \nhttp://${process.env.PRIVATE_IP}:5173/tg?sec=${code}&id=${user.id}`);

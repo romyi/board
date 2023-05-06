@@ -35,7 +35,6 @@ export default class SocketManager
 
     authorize(token: string)
     {
-        console.log('token ', token)
         this.socket.auth = {'authorization': token};
     }
 

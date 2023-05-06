@@ -58,7 +58,6 @@ export class Room
     start_match()
     {
         this.match = new Match(this.carried_inform(this.server, this.channel), this.list_players())
-        console.log('game started')
         // this.inform('room.game.start', {})
     }
 }

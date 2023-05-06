@@ -1,15 +1,18 @@
 {
   "private": true,
-  "workspaces": [
-    "client",
-    "server"
-  ],
+  "workspaces": {
+    "packages": [
+      "client",
+      "server",
+      "shared"
+    ]
+  },
   "name": "board",
   "version": "1.0.0",
   "description": "boardgame_template",
   "license": "MIT",
   "scripts": {
-    "start:dev:server": "yarn workspace server start:dev",
-    "start:dev:client": "yarn workspace client dev"
+    "start:dev:server": "yarn workspace @mun/server start:dev",
+    "start:dev:client": "yarn workspace @mun/client dev"
   }
 }

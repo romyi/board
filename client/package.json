@@ -1,5 +1,5 @@
 {
-  "name": "client",
+  "name": "@mun/client",
   "private": true,
   "version": "0.0.0",
   "scripts": {
@@ -8,6 +8,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@mun/shared": "1.0.0",
     "@tanstack/react-query": "^4.27.0",
     "framer-motion": "^10.12.4",
     "lottie-react": "^2.4.0",

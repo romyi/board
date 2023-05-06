@@ -5,6 +5,7 @@ import { AuthService } from "@app/auth/auth.service";
 import { JwtService } from "@nestjs/jwt";
 import { UserService } from "@app/user/user.service";
 import { RoomService_2 } from "@app/room/room.service_2";
+import { MatchMessages } from "@mun/shared";
 
 export interface ExtendedSocket extends Socket {
   decoded: any
@@ -54,7 +55,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         this.handleDisconnect(client);
       }
     } catch (error) {
-      console.log(error)
+      this.handleDisconnect(client)
     }
 }
 
@@ -117,7 +118,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
     }
   }
 
-  @SubscribeMessage("start.match")
+  @SubscribeMessage(MatchMessages.START)
   async onStart(client: ExtendedSocket, room_id: string)
   {
     const room_to_start = this.roomService.find(room_id);
@@ -139,7 +140,6 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   @SubscribeMessage("report.match.state")
   async onGameState(client: ExtendedSocket, room_id: string)
   {
-    console.log(client.decoded);
     // const { room } = await this.userService.findUser(client.decoded.id);
     const room = this.roomService.rooms.get(room_id);
     client.emit("game state", room ? room.match.inform() : null)

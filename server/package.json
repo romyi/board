@@ -1,5 +1,5 @@
 {
-  "name": "server",
+  "name": "@mun/server",
   "version": "0.0.1",
   "description": "",
   "author": "",
@@ -20,7 +20,9 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@mun/shared": "^1.0.0",
     "@nestjs/common": "^9.0.0",
+    "@nestjs/config": "^2.3.1",
     "@nestjs/core": "^9.0.0",
     "@nestjs/jwt": "^10.0.2",
     "@nestjs/passport": "^9.0.3",

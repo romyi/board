@@ -3,6 +3,7 @@ import useSocketManager from "@hooks/useSocketManager";
 import { useLocation } from "wouter";
 import { useRecoilValue } from "recoil";
 import { roomState } from "@states/room";
+import { MatchMessages } from "@mun/shared";
 
 export const UserStats = () => {
   const { sm } = useSocketManager();
@@ -37,7 +38,9 @@ export const UserStats = () => {
             leave
           </button>
           <button
-            onClick={() => sm.emit({ event: "start.match", data: room.id })}
+            onClick={() =>
+              sm.emit({ event: MatchMessages.START, data: room.id })
+            }
           >
             start
           </button>

@@ -14,10 +14,12 @@ function App() {
   const [, setgameplay] = useRecoilState(gameplayState);
   const [, setClient] = useRecoilState(clientState);
   useEffect(() => {
-    sm.connect();
-    sm.onMessage("room.state", (data) => setroom(data));
-    sm.onMessage("game state", (data) => setgameplay({ match: data }));
-    sm.onMessage("client.state", (data) => setClient({ client: data }));
+    if (localStorage.getItem("token")) {
+      sm.connect();
+      sm.onMessage("room.state", (data) => setroom(data));
+      sm.onMessage("game state", (data) => setgameplay({ match: data }));
+      sm.onMessage("client.state", (data) => setClient({ client: data }));
+    }
   }, []);
   return (
     <Switch>

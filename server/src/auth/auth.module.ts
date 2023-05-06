@@ -7,9 +7,10 @@ import { JwtModule, JwtService } from '@nestjs/jwt';
 import { CodeService } from './codes/code.service';
 import { CustomStrategy } from './strategies/custom.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [PrismaModule, UserModule, JwtModule.register({
+  imports: [PrismaModule, ConfigModule.forRoot(), UserModule, JwtModule.register({
     secret: process.env.JWT_SECRET,
     signOptions: { expiresIn: '2 days' }
   })],

@@ -22,10 +22,11 @@ export const Fetcher = () => {
       if (Boolean(data.access_token)) {
         sm.authorize(data.access_token);
         localStorage.setItem("token", data.access_token);
+        alert("token fetched");
         setLocation("/");
       }
     },
-    enabled: !Boolean(localStorage.getItem("token")),
+    enabled: Boolean(localStorage.getItem("token") !== undefined),
   });
   return (
     <div>

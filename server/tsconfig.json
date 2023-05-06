@@ -18,9 +18,11 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
+      "@mun/shared/*": ["../../shared/*"],
       "@app/*": [
         "./*"
       ]
     }
-  }
+  },
+  "references": [{ "path": "../shared" }]
 }
