@@ -12,21 +12,21 @@ export const HeroesTab = () => {
         return (
           <motion.section
             key={hero.name}
-            animate={
-              typeof match.epoch !== "string" &&
-              match.epoch.hero?.name === hero.name
-                ? {
-                    scale: [1, 1.2, 1],
-                    borderRadius: ["0%", "20%", "0%"],
-                    transition: {
-                      duration: 1,
-                      ease: "easeInOut",
-                      repeat: Infinity,
-                      repeatDelay: 0.5,
-                    },
-                  }
-                : {}
-            }
+            // animate={
+            //   typeof match?.epoch !== "string" &&
+            //   match.epoch?.hero?.name === hero.name
+            //     ? {
+            //         scale: [1, 1.2, 1],
+            //         borderRadius: ["0%", "20%", "0%"],
+            //         transition: {
+            //           duration: 1,
+            //           ease: "easeInOut",
+            //           repeat: Infinity,
+            //           repeatDelay: 0.5,
+            //         },
+            //       }
+            //     : {}
+            // }
             className={`rounded-sm relative ${
               client?.name === hero.name ? "bg-slate-50" : "bg-white"
             } shadow-sm grid grid-cols-2 grid-rows-2 min-w-[100px] overflow-clip`}

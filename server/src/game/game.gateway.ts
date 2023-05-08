@@ -6,6 +6,8 @@ import { JwtService } from "@nestjs/jwt";
 import { UserService } from "@app/user/user.service";
 import { RoomService_2 } from "@app/room/room.service_2";
 import { MatchMessages } from "@shared/index";
+import { Card } from "@app/room/match_night/cards";
+import { Hero } from "@app/room/match_night/hero";
 
 export interface ExtendedSocket extends Socket {
   decoded: any
@@ -128,14 +130,27 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   }
 
   @SubscribeMessage("match.action")
-  async onMatchAction(client: ExtendedSocket, data: {room_id: string, action: 'round' | 'free'})
-  {
+  async onMatchAction(client: ExtendedSocket, data: {room_id: string, message: MatchMessages, card?: Card, hero?: Hero}) {
     const room = this.roomService.find(data.room_id);
-    if (room) {
-      data.action === 'round' && room.match.start_round()
-      data.action === 'free' && room.match.start_free_epoch()
+    if (room.match) {
+      if (data.message === MatchMessages.LAUNCH) {
+        room.match.launch()
+      } else if (data.message === MatchMessages.PLAY) {
+        console.log('played card: ', data.card, ' by hero: ', data.hero.user_channel_id)
+        room.match.activate(data.card, data.hero)
+      }
     }
   }
+
+  // @SubscribeMessage("match.action")
+  // async onMatchAction(client: ExtendedSocket, data: {room_id: string, action: 'round' | 'free'})
+  // {
+  //   const room = this.roomService.find(data.room_id);
+  //   if (room) {
+  //     data.action === 'round' && room.match.start_new_turn()
+  //     // data.action === 'free' && room.match.start_free_epoch()
+  //   }
+  // }
 
   @SubscribeMessage("report.match.state")
   async onGameState(client: ExtendedSocket, room_id: string)

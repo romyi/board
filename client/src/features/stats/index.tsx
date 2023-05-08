@@ -3,7 +3,7 @@ import useSocketManager from "@hooks/useSocketManager";
 import { useLocation } from "wouter";
 import { useRecoilValue } from "recoil";
 import { roomState } from "@states/room";
-import { MatchMessages } from "@mun/shared";
+import { MatchMessages } from "@mun/shared/index";
 
 export const UserStats = () => {
   const { sm } = useSocketManager();
@@ -30,7 +30,7 @@ export const UserStats = () => {
         <div>
           <h3>{room.id}</h3>
           {room.parts.map((participant: any) => {
-            return <div>{participant.name}</div>;
+            return <div key={participant.name}>{participant.name}</div>;
           })}
           <button
             onClick={() => sm.emit({ event: "room.leave", data: room.id })}

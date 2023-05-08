@@ -1,7 +1,7 @@
 import { ExtendedSocket } from '@app/game/game.gateway';
 import { Server } from 'socket.io';
 import { v4 } from 'uuid';
-import { Match } from './match/match';
+import { Match } from './match_night/match';
 
 interface PlayingSocket extends ExtendedSocket {
     status: 'idle' | 'ready' | 'playing'
@@ -57,7 +57,7 @@ export class Room
 
     start_match()
     {
-        this.match = new Match(this.carried_inform(this.server, this.channel), this.list_players())
+        this.match = new Match(this.carried_inform(this.server, this.channel), this.list_players(), this.server)
         // this.inform('room.game.start', {})
     }
 }
