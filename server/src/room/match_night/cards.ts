@@ -7,6 +7,7 @@ export class Card
     id: string
     constructor(
         public title: string,
+        public type: 'door' | 'loot'
     )
     {
         this.id = randomUUID()
@@ -50,7 +51,7 @@ export class Cards
         this.stashcards = new Deck();
         this.doorcards.source = this.stashcards
         this.lootcards.source = this.stashcards
-        this.doorcards.cards = [new Card('door one'), new Card('cool door'), new Card('dangerous door'), new Card('handsome door'), new Card('nice door')]
-        this.lootcards.cards = [new Card('takai loot'), new Card('golden loot'), new Card('loot third'), new Card('desirable loot'), new Card('refined loot')]
+        this.doorcards.cards = [new Card('door one', 'door'), new Card('cool door', 'door'), new Card('dangerous door', 'door'), new Card('handsome door', 'door'), new Card('nice door', 'door')]
+        this.lootcards.cards = [new Card('takai loot', 'loot'), new Card('golden loot', 'loot'), new Card('loot third', 'loot'), new Card('desirable loot', 'loot'), new Card('refined loot', 'loot')]
     }
 }

@@ -1,5 +1,4 @@
-import { Background, HeroesTab } from "@features/gameplay";
-import { Hero } from "@features/gameplay/hero-tab";
+import { Background, HeroesTab, Hero, Decks } from "@features/gameplay";
 import useSocketManager from "@hooks/useSocketManager";
 import { roomState } from "@states/room";
 import React from "react";
@@ -24,13 +23,16 @@ export const Gameplay = () => {
       data: { room_id: room.id, message: "match.launch" },
     });
   return (
-    <>
+    <main className="max-w-[800px] m-auto h-screen flex flex-col items-center justify-between">
       <Background />
       <HeroesTab />
+      <Decks />
       <Hero />
-      <button onClick={handleStart}>start round</button>
-      <button onClick={handleEnd}>finish round</button>
-      <button onClick={handleDeal}>deal</button>
-    </>
+      <div className="mt-[30px]">
+        <button onClick={handleStart}>start round</button>
+        <button onClick={handleEnd}>finish round</button>
+        <button onClick={handleDeal}>deal</button>
+      </div>
+    </main>
   );
 };

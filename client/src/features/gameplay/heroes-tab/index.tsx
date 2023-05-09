@@ -29,7 +29,7 @@ export const HeroesTab = () => {
             // }
             className={`rounded-sm relative ${
               client?.name === hero.name ? "bg-slate-50" : "bg-white"
-            } shadow-sm grid grid-cols-2 grid-rows-2 min-w-[100px] overflow-clip`}
+            } shadow-sm grid grid-cols-2  min-w-[50px] overflow-clip`}
           >
             {!hero.isOnline && (
               <section className="opacity-10 inline bg-black col-start-1 col-end-3 row-start-1 row-end-3" />
@@ -37,9 +37,9 @@ export const HeroesTab = () => {
             <h2 className="col-start-1 inline col-end-3 row-start-1 row-end-2 p-2">
               {hero.name}
             </h2>
-            <h3 className="col-start-1 inline col-end-3 row-start-2 row-end-3 p-2">
+            {/* <h3 className="col-start-1 inline col-end-3 row-start-2 row-end-3 p-2">
               {hero.rank}
-            </h3>
+            </h3> */}
           </motion.section>
         );
       })}

@@ -34,7 +34,6 @@ export class Match
     @reportMatchState
     launch() { 
         this.heroes.forEach((hero) => this.dealer.deal_cards(hero));
-        console.log('dealing complete')
         this.start_new_turn()
     }
 
@@ -65,8 +64,7 @@ export class Match
         }),
         doors: 1,
         loots: 2,
-        epoch: this.round?.protagoinist, //!
-        // turn: this.turner //!
+        epoch: this.round?.protagoinist,
         })
         this.heroes.forEach((hero) => this.server.to(hero.user_channel_id).emit('hero', hero))
     }
