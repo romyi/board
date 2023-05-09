@@ -12,9 +12,9 @@ export const Meta = () => {
     <div className="absolute bottom-1 flex gap-12">
       <p className="block">{socket.connected ? "online" : ""}</p>
       <p className="block">{room?.id ?? ""}</p>
-      {gameplay.match !== null && (
+      {/* {gameplay.match !== null && (
         <p className="block">{gameplay.match?.epoch as string}</p>
-      )}
+      )} */}
     </div>
   );
 };

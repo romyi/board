@@ -4,7 +4,8 @@ import { Dealer } from "./dealer";
 import { Hero } from "./hero";
 import { Round } from "./round";
 import { Turner } from "./turner";
-import { Server } from "socket.io";
+import { BroadcastOperator, Server } from "socket.io";
+import { DefaultEventsMap } from "socket.io/dist/typed-events";
 
 export class Match
 {
@@ -13,13 +14,15 @@ export class Match
     turner: Turner
     round: Round = null
     heroes: Hero[] = []
+    emitter: (to: string, event: string, data: unknown) => boolean
     constructor(
         public informer: Function,
         heroes: Array<ExtendedSocket['decoded']>,
         public server: Server
     ){
+        this.emitter = (to: string, event: string, data: unknown) => this.server.to(to).emit(event, data);
         heroes.forEach((extended) => {
-            const new_hero = new Hero(extended.name, String(extended.id), extended.name)
+            const new_hero = new Hero(this.emitter, String(extended.id), extended.name)
             this.server.to(String(extended.id)).emit("hero", new_hero);
             this.heroes.push( new_hero )
             
@@ -27,6 +30,7 @@ export class Match
         this.cards = new Cards(this);
         this.dealer = new Dealer(this);
         this.turner = new Turner(this);
+        this.round = new Round(this);
         this.informer = informer;
         this.inform()
     }
@@ -60,7 +64,7 @@ export class Match
         console.log('start info')
         this.informer('game state', {
         heroes: this.heroes.map((hero) => {
-            return {...hero, hand: hero.hand.cards.length}
+            return {name: hero.name, isOnline: hero.isOnline, hand: hero.hand.cards.length}
         }),
         doors: 1,
         loots: 2,

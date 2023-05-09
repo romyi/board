@@ -1,5 +1,6 @@
 import { Background, HeroesTab, Hero, Decks } from "@features/gameplay";
 import useSocketManager from "@hooks/useSocketManager";
+import { MatchMessages } from "@shared/index";
 import { roomState } from "@states/room";
 import React from "react";
 import { useRecoilValue } from "recoil";
@@ -10,7 +11,7 @@ export const Gameplay = () => {
   const handleStart = () =>
     sm.emit({
       event: "match.action",
-      data: { room_id: room.id, action: "round" },
+      data: { room_id: room.id, message: MatchMessages.ROUND_START_VOICE },
     });
   const handleEnd = () =>
     sm.emit({
@@ -28,9 +29,8 @@ export const Gameplay = () => {
       <HeroesTab />
       <Decks />
       <Hero />
-      <div className="mt-[30px]">
+      <div className="mt-[30px] flex gap-4">
         <button onClick={handleStart}>start round</button>
-        <button onClick={handleEnd}>finish round</button>
         <button onClick={handleDeal}>deal</button>
       </div>
     </main>
