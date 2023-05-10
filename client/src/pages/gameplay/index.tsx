@@ -1,13 +1,15 @@
 import { Background, HeroesTab, Hero, Decks } from "@features/gameplay";
 import useSocketManager from "@hooks/useSocketManager";
 import { MatchMessages } from "@shared/index";
+import { gameplayState } from "@states/gameplay";
 import { roomState } from "@states/room";
 import React from "react";
-import { useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 
 export const Gameplay = () => {
   const room = useRecoilValue(roomState);
   const { sm } = useSocketManager();
+  const { match } = useRecoilValue(gameplayState);
   const handleStart = () =>
     sm.emit({
       event: "match.action",
@@ -30,7 +32,9 @@ export const Gameplay = () => {
       <Decks />
       <Hero />
       <div className="mt-[30px] flex gap-4">
-        <button onClick={handleStart}>start round</button>
+        {!match?.epoch.name && (
+          <button onClick={handleStart}>start round</button>
+        )}
         <button onClick={handleDeal}>deal</button>
       </div>
     </main>

@@ -68,7 +68,7 @@ export class Match
         }),
         doors: 1,
         loots: 2,
-        epoch: this.round?.protagoinist,
+        epoch: {...this.round?.protagoinist, hand: null},
         })
         this.heroes.forEach((hero) => this.server.to(hero.user_channel_id).emit('hero', hero))
     }

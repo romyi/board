@@ -2,7 +2,8 @@ export enum MatchMessages {
     START = "match.start",
     LAUNCH = "match.launch",
     PLAY = "match.card.play",
-    ROUND_START_VOICE = "match.round.start"
+    ROUND_START_VOICE = "match.round.start",
+    MECHANIC = "match.mechanic"
 }
 
 export enum MatchMechanics {

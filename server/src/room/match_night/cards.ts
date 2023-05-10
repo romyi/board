@@ -29,6 +29,10 @@ export class Deck
     stack(stacked: Card[]) {
         this.cards.push(...stacked);
     }
+    /**
+     * Return specific card from deck
+     * @param played_card Card to be exposed from a deck
+     */
     specific(played_card: Card) {
         const i = this.cards.findIndex(card => card.id === played_card.id);
         return this.cards.splice(i, 1)

@@ -141,6 +141,9 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       } else if (data.message === MatchMessages.ROUND_START_VOICE) { 
         console.log('captured round start query')
         room.match.round.voice() 
+      } else if (data.message === MatchMessages.MECHANIC) {
+        const door = room.match.cards.doorcards.cards.pop();
+        room.match.round.cards_in_action.cards.push(door);
       }
     }
   }
