@@ -23,7 +23,7 @@ export const Gameplay = () => {
   const handleDeal = () =>
     sm.emit({
       event: "match.action",
-      data: { room_id: room.id, message: "match.launch" },
+      data: { room_id: room.id, message: MatchMessages.DEAL },
     });
   return (
     <main className="max-w-[800px] m-auto h-screen flex flex-col items-center justify-between">

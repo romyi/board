@@ -27,26 +27,26 @@ export class Match
             this.heroes.push( new_hero )
             
         });
-        this.cards = new Cards(this);
-        this.dealer = new Dealer(this);
-        this.turner = new Turner(this);
-        this.round = new Round(this);
+        this.cards = new Cards(this.invoke_mechanic);
+        this.dealer = new Dealer(this.cards);
+        this.turner = new Turner(this.heroes);
         this.informer = informer;
-        this.inform()
+        this.round = new Round(this.heroes, this.turner, () => this.informer('game state', this.state));
+        this.informer('game state', this.state)
     }
 
     @reportMatchState
     launch() { 
         this.heroes.forEach((hero) => this.dealer.deal_cards(hero));
-        this.start_new_turn()
+        // this.start_new_turn()
     }
 
-    @reportMatchState
-    start_new_turn() { this.round = new Round(this) }
+    // @reportMatchState
+    // start_new_turn() { this.round = new Round(this.heroes, this.turner, this.inform) }
 
     @reportMatchState
     activate(card: Card, player: Hero) {
-        this.cards.effects.take(this, player)
+        this.cards.effects.take(player)
         this.dealer.stash_specific(card, this.heroes.find((hero) => hero.user_channel_id === player.user_channel_id))
     }
 
@@ -60,26 +60,38 @@ export class Match
     @reportMatchState
     hero_active(connected_id: string) { this.heroes.find((hero) => hero.user_channel_id === String(connected_id)).isOnline = true }
 
-    inform() {
-        console.log('start info')
-        this.informer('game state', {
-        heroes: this.heroes.map((hero) => {
-            return {name: hero.name, isOnline: hero.isOnline, hand: hero.hand.cards.length}
-        }),
-        doors: 1,
-        loots: 2,
-        epoch: {...this.round?.protagoinist, hand: null},
-        })
-        this.heroes.forEach((hero) => this.server.to(hero.user_channel_id).emit('hero', hero))
+    get state() {
+        return {
+            heroes: this.heroes.map((hero) => {
+                return {name: hero.name, isOnline: hero.isOnline, hand: hero.hand.cards.length}
+            }),
+            doors: 1,
+            loots: 2,
+            epoch: {...this.round?.protagonist, hand: null},
+            }
+        }
     }
-}
+
+    // inform() {
+    //     console.log('start info')
+    //     this.informer('game state', {
+    //     heroes: this.heroes.map((hero) => {
+    //         return {name: hero.name, isOnline: hero.isOnline, hand: hero.hand.cards.length}
+    //     }),
+    //     doors: 1,
+    //     loots: 2,
+    //     epoch: {...this.round?.protagoinist, hand: null},
+    //     })
+    //     this.heroes.forEach((hero) => this.server.to(hero.user_channel_id).emit('hero', hero))
+    // }
 
 function reportMatchState(target: any, propertyName: string, descriptor: PropertyDescriptor)
 {
  const matchMethod = descriptor.value;
  descriptor.value = function(...args: any[]) {
     const result = matchMethod.apply(this, args);
-    this.inform();
+    this.informer('game state', this.state);
+    this.heroes.forEach((hero) => this.server.to(hero.user_channel_id).emit('hero', hero))
     return result;
  }
 }

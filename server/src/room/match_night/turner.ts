@@ -6,7 +6,7 @@ export class Turner
     set alternative(a: number | null) {
         this._alternative = a
     }
-    constructor(protected match: Match){
+    constructor(protected heroes: Match['heroes']){
         this.gen = this.passer()
     }
     *passer(): Generator<number, number, unknown>
@@ -17,8 +17,8 @@ export class Turner
                 start = this._alternative
                 this.alternative = null
             }
-            if (start === this.match.heroes.length) { start = 0 }
-            if (this.match.heroes[start].isOnline === false) {
+            if (start === this.heroes.length) { start = 0 }
+            if (this.heroes[start].isOnline === false) {
                 start ++
                 continue;
             };
@@ -28,6 +28,6 @@ export class Turner
     gen: Generator<number, number, unknown>
 
     public pass_turn() {
-        return this.match.heroes[this.gen.next().value]
+        return this.heroes[this.gen.next().value]
     }
 }

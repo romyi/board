@@ -7,7 +7,6 @@ export const Meta = () => {
   const { socket } = useSocketManager();
   const room = useRecoilValue(roomState);
   const gameplay = useRecoilValue(gameplayState);
-  console.log(gameplay);
   return (
     <div className="absolute bottom-1 flex gap-12">
       <p className="block">{socket.connected ? "online" : ""}</p>

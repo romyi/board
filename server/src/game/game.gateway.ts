@@ -46,7 +46,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             const state = {id: joined.id, parts: joined.list_players()}
             client.emit('room.state', state)
             if (joined.match !== null) {
-              joined.match.inform()
+              joined.match.informer('game state', joined.match.state)
             }
           }
           if (!joined) {
@@ -133,7 +133,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
   async onMatchAction(client: ExtendedSocket, data: {room_id: string, message: MatchMessages, card?: Card, hero?: Hero}) {
     const room = this.roomService.find(data.room_id);
     if (room.match) {
-      if (data.message === MatchMessages.LAUNCH) {
+      if (data.message === MatchMessages.DEAL) {
         room.match.launch()
       } else if (data.message === MatchMessages.PLAY) {
         console.log('played card: ', data.card, ' by hero: ', data.hero.user_channel_id)
@@ -143,26 +143,10 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         room.match.round.voice() 
       } else if (data.message === MatchMessages.MECHANIC) {
         const door = room.match.cards.doorcards.cards.pop();
-        room.match.round.cards_in_action.cards.push(door);
+        console.log('activated card: ', door)
+        door.activate(room.match);
+        console.log(room.match.round)
       }
     }
-  }
-
-  // @SubscribeMessage("match.action")
-  // async onMatchAction(client: ExtendedSocket, data: {room_id: string, action: 'round' | 'free'})
-  // {
-  //   const room = this.roomService.find(data.room_id);
-  //   if (room) {
-  //     data.action === 'round' && room.match.start_new_turn()
-  //     // data.action === 'free' && room.match.start_free_epoch()
-  //   }
-  // }
-
-  @SubscribeMessage("report.match.state")
-  async onGameState(client: ExtendedSocket, room_id: string)
-  {
-    // const { room } = await this.userService.findUser(client.decoded.id);
-    const room = this.roomService.rooms.get(room_id);
-    client.emit("game state", room ? room.match.inform() : null)
   }
 }
