@@ -144,6 +144,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
       } else if (data.message === MatchMessages.MECHANIC) {
         const door = room.match.cards.doorcards.cards.pop();
         console.log('activated card: ', door)
+        room.match.informer('announce', { message: 'door picked', data: door})
         door.activate(room.match);
         console.log(room.match.round)
       }
