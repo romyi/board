@@ -51,9 +51,9 @@ interface InterchangeState {
 
 // common server-wide in-memory schema
 // socket_id present only if online
-type HeroSchema = Map<string, {match_id: string, socket_id: string, tier: number, power: number, isInitiator: boolean}>
+export type HeroSchema = Map<string, {match_id: string, socket_id: string, tier: number, power: number, isInitiator: boolean}>
 // common server-wide in-memory schema
-type MatchSchema = Map<string, {heroes: Array<{hero_id: string, name: string}>}>
+export type MatchSchema = Map<string, {heroes: Array<{hero_id: string, name: string}>}>
 
 // common server-wide in-memory entry-lifetime-TEMPORARY (~3min) schema
 // there is also a server method that can built match schema based on draft participants

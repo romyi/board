@@ -8,9 +8,10 @@ import { AuthModule } from './auth/auth.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { UserModule } from './user/user.module';
 import { JwtModule } from '@nestjs/jwt';
+import { AlphaCoreGateway } from '@app/alpha/core/alpha-gateway.module';
 
 @Module({
-  imports: [GameModule, RoomModule, BotModule, AuthModule, ScheduleModule.forRoot(), UserModule, JwtModule.register({
+  imports: [AlphaCoreGateway, BotModule, AuthModule, ScheduleModule.forRoot(), UserModule, JwtModule.register({
     secret: process.env.JWT_SECRET,
     signOptions: { expiresIn: '2 days' }
   })],

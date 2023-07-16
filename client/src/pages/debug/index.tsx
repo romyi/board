@@ -1,23 +1,44 @@
-import React, { useEffect, useState } from "react";
-import { randomUUID } from "crypto";
+import { useEffect, useState } from "react";
 import useSocketManager from "../../hooks/useSocketManager";
+import { events } from "@mun/shared/alpha/payloads";
 
 interface DebugOptions {
   heroes: Array<{ name: string }>;
+  ongoing_mode: boolean;
 }
 
 const test_samples = ["Ivan", "Roma", "Tanya", "Artem", "Vlad", "Igor"];
 
 export const Debug = () => {
   const { sm } = useSocketManager();
+  useEffect(() => {
+    sm.connect();
+  });
   const [samples, setsamples] = useState(test_samples);
-  const [options, setoptions] = useState<DebugOptions>({ heroes: [] });
+  const [options, setoptions] = useState<DebugOptions>({
+    heroes: [],
+    ongoing_mode: false,
+  });
   const onAddButtonClick = () => {
     const name = samples.slice(-1);
     setoptions({
+      ...options,
       heroes: [...options.heroes, { name: name[0] }],
     });
     setsamples(samples.slice(0, -1));
+  };
+  const onRemoveClick = (name: string) => {
+    setoptions({
+      ...options,
+      heroes: options.heroes.filter((hero) => hero.name !== name),
+    });
+    setsamples([...samples, name]);
+  };
+  const onStartDebugClick = () => {
+    sm.emit({
+      event: events["debug.start"].name,
+      data: options.heroes,
+    });
   };
   return (
     <main className="h-screen p-4 w-full">
@@ -44,25 +65,66 @@ export const Debug = () => {
           <div>
             {options.heroes.map((hero) => {
               return (
-                <div key={hero.name} className="mt-2">
+                <div key={hero.name} className="mt-2 grid grid-cols-4">
                   <input disabled value={hero.name} />
+                  {options.ongoing_mode && (
+                    <>
+                      <section>
+                        <p className="text-slate-300 text-sm font-thin">
+                          cards
+                        </p>
+                      </section>
+                    </>
+                  )}
+                  <button
+                    onClick={() => onRemoveClick(hero.name)}
+                    className="text-pink-300 col-start-4"
+                  >
+                    x
+                  </button>
                 </div>
               );
             })}
             {samples.length > 0 && (
-              <button className="mt-4" onClick={onAddButtonClick}>
-                + hero
+              <button
+                className="mt-4 p-1 bg-cyan-100"
+                onClick={onAddButtonClick}
+              >
+                add hero
               </button>
             )}
           </div>
-          <label>
-            debug from middle of the match
-            <input
+          <p className="mt-4 text-slate-500 font-thin text-sm">
+            ongoing mode <span className="text-pink-500 text-sm">soon</span>
+            {/* <input
+              disabled={true}
+              checked={options.ongoing_mode}
+              onChange={() =>
+                setoptions({ ...options, ongoing_mode: !options.ongoing_mode })
+              }
               className="mt-4 ml-2"
               type="checkbox"
               id="debug-from-start"
-            />
-          </label>
+            /> */}
+          </p>
+          <p className="text-slate-500 text-xs font-thin mt-1">
+            assign some cards to heroes and simulate various situations from
+            scratch
+          </p>
+        </section>
+        <section className="mt-6">
+          {options.heroes.length > 2 ? (
+            <button
+              className="mt-4 p-1 bg-cyan-400"
+              onClick={onStartDebugClick}
+            >
+              start session
+            </button>
+          ) : (
+            <p className="font-thin text-sm">
+              add {3 - options.heroes.length} more hero(es)
+            </p>
+          )}
         </section>
       </article>
     </main>

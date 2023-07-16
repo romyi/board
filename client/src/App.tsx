@@ -8,6 +8,7 @@ import { roomState } from "@states/room";
 import { gameplayState } from "@states/gameplay";
 import { clientState } from "@states/client";
 import { heroState } from "@states/hero";
+import { AlphaGameplay } from "./pages/debug/alpha-gameplay";
 
 function App() {
   const { sm } = useSocketManager();
@@ -26,10 +27,11 @@ function App() {
   }, []);
   return (
     <Switch>
-      <Route path="/" component={Intro} />
+      {/* <Route path="/" component={Intro} /> */}
       <Route path="/debug" component={Debug} />
-      <Route path="/tg" component={Fetcher} />
-      <Route path={`/${room.id}`} component={Gameplay} />
+      <Route path="/debug/hero" component={AlphaGameplay} />
+      {/* <Route path="/tg" component={Fetcher} /> */}
+      {/* <Route path={`/${room.id}`} component={Gameplay} /> */}
     </Switch>
   );
 }
