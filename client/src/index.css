@@ -3,6 +3,15 @@
 @tailwind utilities;
 
 @layer base {
+    @font-face {
+        font-family: "MCW";
+        src: url('/mcw_regular.woff');
+        font-weight: 400;
+        font-style: normal;
+    }
+    html {
+        font-family: 'MCW';
+    }
     input[type=number]:focus {
         outline: none
     }
