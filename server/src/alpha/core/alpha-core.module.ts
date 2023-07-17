@@ -1,8 +1,7 @@
 import { Module } from "@nestjs/common";
-import { CoreService } from "./alpha-core.hero-schema";
+import { CoreService } from "./alpha-core.service";
 
 @Module({
-    imports: [],
     providers: [CoreService],
     exports: [CoreService]
 })

@@ -16,7 +16,7 @@
 
 // detailed card info is requested via REST endpoint
 // GET info?card=name
-interface InterchangeCard {
+export interface InterchangeCard {
     id: string
     name: string
     group: string
@@ -72,7 +72,7 @@ interface InterchangeInvitation {
 // per-match in-memory schema
 type CardSchema = Map<string, {name: string, owner: string, deck: string}>
 // or owner-proiritiezed map
-type OwnerFirstCardSchema = Map<string, Map<string, {name: string, card_id: string, group: string}>>
+export type OwnerFirstCardSchema = Map<string, Map<string, {name: string, card_id: string, group: string}>>
 // map key = hero_id if card is owned by a hero or game_id if it isn't but yet in game (common decks)
 
 interface InterchangeClientMessage {

@@ -11,14 +11,27 @@ const test_samples = ["Ivan", "Roma", "Tanya", "Artem", "Vlad", "Igor"];
 
 export const Debug = () => {
   const { sm } = useSocketManager();
-  useEffect(() => {
-    sm.connect();
-  });
-  const [samples, setsamples] = useState(test_samples);
   const [options, setoptions] = useState<DebugOptions>({
-    heroes: [],
+    heroes: localStorage.getItem("debug_hero_names")
+      ? JSON.parse(localStorage.getItem("debug_hero_names") as string)
+      : [],
     ongoing_mode: false,
   });
+  console.log(options);
+  const hasDebugOngoing =
+    localStorage.getItem("debug_hero_names") &&
+    localStorage.getItem("debug_hero_ids");
+  useEffect(() => {
+    sm.connect();
+    sm.onMessage("alpha-debug-heroes", (heroes) => {
+      localStorage.setItem("debug_hero_ids", JSON.stringify(heroes));
+      console.log(options);
+      console.log(options.heroes);
+      console.log(JSON.stringify(options.heroes));
+      // localStorage.setItem("debug_hero_names", JSON.stringify(options.heroes));
+    });
+  }, []);
+  const [samples, setsamples] = useState(test_samples);
   const onAddButtonClick = () => {
     const name = samples.slice(-1);
     setoptions({
@@ -76,16 +89,20 @@ export const Debug = () => {
                       </section>
                     </>
                   )}
-                  <button
-                    onClick={() => onRemoveClick(hero.name)}
-                    className="text-pink-300 col-start-4"
-                  >
-                    x
-                  </button>
+                  {!hasDebugOngoing ? (
+                    <button
+                      onClick={() => onRemoveClick(hero.name)}
+                      className="text-pink-300 col-start-4"
+                    >
+                      x
+                    </button>
+                  ) : (
+                    <button className="text-cyan-800 col-start-4">view</button>
+                  )}
                 </div>
               );
             })}
-            {samples.length > 0 && (
+            {samples.length > 0 && !hasDebugOngoing && (
               <button
                 className="mt-4 p-1 bg-cyan-100"
                 onClick={onAddButtonClick}
@@ -113,7 +130,7 @@ export const Debug = () => {
           </p>
         </section>
         <section className="mt-6">
-          {options.heroes.length > 2 ? (
+          {options.heroes.length > 2 && !hasDebugOngoing ? (
             <button
               className="mt-4 p-1 bg-cyan-400"
               onClick={onStartDebugClick}

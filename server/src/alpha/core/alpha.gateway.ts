@@ -2,7 +2,7 @@ import { OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessa
 import { Socket } from "socket.io";
 import { events } from '@shared/alpha/payloads';
 import { randomUUID } from "crypto";
-import { CoreService } from "./alpha-core.hero-schema";
+import { CoreService } from "./alpha-core.service";
 
 @WebSocketGateway()
 export class AlphaGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
@@ -14,10 +14,7 @@ export class AlphaGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
         console.log('alpha started')
     }
 
-    async handleConnection(client: Socket) {
-        console.log('client connects to alpha')
-        client.emit('alpha gateway', 'hello')
-    }
+    async handleConnection() {}
 
     async handleDisconnect(client: Socket) {
         console.log('client leaves alpha')
@@ -25,9 +22,9 @@ export class AlphaGateway implements OnGatewayInit, OnGatewayConnection, OnGatew
     }
 
     @SubscribeMessage(events["debug.start"].name)
-    async onStartDebugGame( _ ,message)
+    async onStartDebugGame( client: Socket, message)
     {
-        // const matchKey = this.matchSchema.set(randomUUID(), {heroes: message.map((hero) => ({name: hero, id: randomUUID()}))})
-        // console.log(matchKey)
+        const heroes = this.core.init_match(message);
+        client.emit('alpha-debug-heroes', heroes)
     }
 }
