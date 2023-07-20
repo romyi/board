@@ -29,7 +29,7 @@ function App() {
     <Switch>
       {/* <Route path="/" component={Intro} /> */}
       <Route path="/debug" component={Debug} />
-      <Route path="/debug/hero" component={AlphaGameplay} />
+      <Route path="/debug/session" component={AlphaGameplay} />
       {/* <Route path="/tg" component={Fetcher} /> */}
       {/* <Route path={`/${room.id}`} component={Gameplay} /> */}
     </Switch>

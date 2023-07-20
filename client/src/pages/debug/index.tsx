@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import useSocketManager from "../../hooks/useSocketManager";
 import { events } from "@mun/shared/alpha/payloads";
+import { useMultitab } from "@features/alpha-store";
+export * from "./alpha-gameplay";
 
 interface DebugOptions {
   heroes: Array<{ name: string }>;
@@ -8,27 +10,23 @@ interface DebugOptions {
 }
 
 const test_samples = ["Ivan", "Roma", "Tanya", "Artem", "Vlad", "Igor"];
-
 export const Debug = () => {
   const { sm } = useSocketManager();
+  const { storage } = useMultitab<Array<{ name: string }>>("debug_heroes");
+  const { storage: game } = useMultitab<{ id: string }>("match");
+  const { storage: ids } =
+    useMultitab<Record<string, string>>("debug_hero_ids");
   const [options, setoptions] = useState<DebugOptions>({
-    heroes: localStorage.getItem("debug_hero_names")
-      ? JSON.parse(localStorage.getItem("debug_hero_names") as string)
-      : [],
+    heroes: storage.data || [],
     ongoing_mode: false,
   });
-  console.log(options);
-  const hasDebugOngoing =
-    localStorage.getItem("debug_hero_names") &&
-    localStorage.getItem("debug_hero_ids");
+  const hasDebugOngoing = Boolean(storage.data && ids.data);
   useEffect(() => {
+    window.document.title = "Testing settings";
     sm.connect();
-    sm.onMessage("alpha-debug-heroes", (heroes) => {
-      localStorage.setItem("debug_hero_ids", JSON.stringify(heroes));
-      console.log(options);
-      console.log(options.heroes);
-      console.log(JSON.stringify(options.heroes));
-      // localStorage.setItem("debug_hero_names", JSON.stringify(options.heroes));
+    sm.onMessage("alpha-debug-heroes", ({ heroes, match }) => {
+      ids.store(heroes);
+      game.store({ id: match });
     });
   }, []);
   const [samples, setsamples] = useState(test_samples);
@@ -48,11 +46,13 @@ export const Debug = () => {
     setsamples([...samples, name]);
   };
   const onStartDebugClick = () => {
+    storage.store([...options.heroes]);
     sm.emit({
       event: events["debug.start"].name,
-      data: options.heroes,
+      data: [...options.heroes],
     });
   };
+  const onStopDebugClick = () => {};
   return (
     <main className="h-screen p-4 w-full">
       <article className=" m-auto mt-20 p-4 shadow-md bg-white-50 w-[400px] mih-[400px] rounded-lg">
@@ -97,7 +97,16 @@ export const Debug = () => {
                       x
                     </button>
                   ) : (
-                    <button className="text-cyan-800 col-start-4">view</button>
+                    <a
+                      className="col-start-4 text-cyan-600"
+                      href={`session?id=${ids.data?.[hero.name]}&name=${
+                        hero.name
+                      }`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      view
+                    </a>
                   )}
                 </div>
               );
@@ -130,13 +139,22 @@ export const Debug = () => {
           </p>
         </section>
         <section className="mt-6">
-          {options.heroes.length > 2 && !hasDebugOngoing ? (
-            <button
-              className="mt-4 p-1 bg-cyan-400"
-              onClick={onStartDebugClick}
-            >
-              start session
-            </button>
+          {options.heroes.length > 2 ? (
+            hasDebugOngoing ? (
+              <>
+                <button className="mt-4 p-1 bg-slate-800 text-white">
+                  stop session
+                </button>
+                <p className="text-sm mt-4">{game.data?.id}</p>
+              </>
+            ) : (
+              <button
+                className="mt-4 p-1 bg-cyan-400"
+                onClick={onStartDebugClick}
+              >
+                start session
+              </button>
+            )
           ) : (
             <p className="font-thin text-sm">
               add {3 - options.heroes.length} more hero(es)
