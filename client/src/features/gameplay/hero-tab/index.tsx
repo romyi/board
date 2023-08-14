@@ -8,7 +8,6 @@ export const Hero = () => {
   const { hero } = useRecoilValue(heroState);
   const { id } = useRecoilValue(roomState);
   const { sm } = useSocketManager();
-  console.log("hero component redrawn, cards: ", hero?.hand);
   return (
     <div className="flex flex-wrap gap-4 mt-auto">
       {hero?.hand.cards.map((card: Client.BoardCard) => {

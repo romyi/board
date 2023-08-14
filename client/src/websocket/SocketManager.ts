@@ -4,77 +4,67 @@ import { SocketState } from "./SocketState";
 import { QueryClient } from "@tanstack/react-query";
 
 type EmitOptions<T> = {
-    event: string,
-    data?: T
-}
+  event: string;
+  data?: T;
+};
 
-export default class SocketManager
-{
-    public readonly socket: Socket;
-    public setSocketState: SetterOrUpdater<SocketState>;
-    public queryClient: QueryClient;
-    constructor()
-    {
-        this.socket = io(`http://${import.meta.env.VITE_PRIVATE_IP}:3000`, {
-            autoConnect: false,
-            auth: {
-                "authorization": localStorage.getItem('token') ?? 'not authorized'
-            },
-            path: '/wsapi',
-            withCredentials: true
-        })
+export default class SocketManager {
+  public readonly socket: Socket;
+  public setSocketState: SetterOrUpdater<SocketState>;
+  public queryClient: QueryClient;
+  constructor() {
+    this.socket = io(`http://localhost:3000`, {
+      autoConnect: false,
+      auth: {
+        authorization: localStorage.getItem("token") ?? "not authorized",
+      },
+      path: "/wsapi",
+      withCredentials: true,
+    });
 
-        this.onConnect()
-        this.onDisconnect()
+    this.onConnect();
+    this.onDisconnect();
 
-        // this.onMessage("room.join", (payload) => {
-        //     const { query } = payload;
-        //     this.queryClient.invalidateQueries([query])
-        // })
-    }
+    // this.onMessage("room.join", (payload) => {
+    //     const { query } = payload;
+    //     this.queryClient.invalidateQueries([query])
+    // })
+  }
 
-    authorize(token: string)
-    {
-        this.socket.auth = {'authorization': token};
-    }
+  authorize(token: string) {
+    this.socket.auth = { authorization: token };
+  }
 
-    emit<T>(options: EmitOptions<T>): this
-    {
-        this.socket.emit(options.event, options.data)
-        return this
-    }
+  emit<T>(options: EmitOptions<T>): this {
+    this.socket.emit(options.event, options.data);
+    return this;
+  }
 
-    connect(): void
-    {
-        this.socket.connect()
-    }
+  connect(): void {
+    this.socket.connect();
+  }
 
-    disconnect(): void
-    {
-        this.socket.disconnect()
-    }
+  disconnect(): void {
+    this.socket.disconnect();
+  }
 
-    private onConnect(): void
-    {
-        this.socket.on('connect', () => {
-            this.setSocketState((state) => {
-                return {...state, connected: true}
-            })
-        })
-    }
+  private onConnect(): void {
+    this.socket.on("connect", () => {
+      this.setSocketState((state) => {
+        return { ...state, connected: true };
+      });
+    });
+  }
 
-    private onDisconnect(): void
-    {
-        this.socket.on('disconnect', async (reason: Socket.DisconnectReason) => {
+  private onDisconnect(): void {
+    this.socket.on("disconnect", async (reason: Socket.DisconnectReason) => {
+      this.setSocketState((state) => {
+        return { ...state, connected: false };
+      });
+    });
+  }
 
-            this.setSocketState((state) => {
-                return {...state, connected: false}
-            })
-        })
-    }
-
-    onMessage(type: string, callback: (payload: any) => void): void
-    {
-        this.socket.on(type, callback)
-    }
+  onMessage(type: string, callback: (payload: any) => void): void {
+    this.socket.on(type, callback);
+  }
 }

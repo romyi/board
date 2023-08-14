@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Route, Switch } from "wouter";
 import useSocketManager from "./hooks/useSocketManager";
-import { Debug, Gameplay, Intro } from "./pages";
+import { Debug, Desk, Gameplay, Intro, Main } from "./pages";
 import { Fetcher } from "@features/collect-jwt";
 import { useRecoilState } from "recoil";
 import { roomState } from "@states/room";
@@ -27,7 +27,7 @@ function App() {
   }, []);
   return (
     <Switch>
-      {/* <Route path="/" component={Intro} /> */}
+      <Route path="/" component={Main} />
       <Route path="/debug" component={Debug} />
       <Route path="/debug/session" component={AlphaGameplay} />
       {/* <Route path="/tg" component={Fetcher} /> */}

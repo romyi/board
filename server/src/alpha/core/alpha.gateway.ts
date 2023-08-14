@@ -1,5 +1,4 @@
 import {
-  OnGatewayConnection,
   OnGatewayDisconnect,
   OnGatewayInit,
   SubscribeMessage,
@@ -8,37 +7,63 @@ import {
 import { Server, Socket } from 'socket.io';
 import { events } from '@shared/alpha/payloads';
 import { CoreService } from './alpha-core.service';
+import { cardsDescription } from '@shared/alpha/configs';
 
 @WebSocketGateway()
-export class AlphaGateway
-  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
-{
+export class AlphaGateway implements OnGatewayInit, OnGatewayDisconnect {
   protected server: Server;
-  constructor(private core: CoreService) {}
+  constructor(protected core: CoreService) {}
 
   async afterInit(server: Server) {
     this.server = server;
   }
 
-  async handleConnection() {
-    console.log('client connects');
-    console.log((await this.server.fetchSockets()).length);
-  }
-
   async handleDisconnect(client: Socket) {
-    console.log('client leaves alpha');
     client.disconnect();
   }
 
   @SubscribeMessage(events['debug.start'].name)
   async onStartDebugGame(client: Socket, message) {
-    const heroes = this.core.init_match(message);
-    client.emit('alpha-debug-heroes', heroes);
+    const init_debug = this.core.init_match(message);
+    client.emit('alpha-debug-heroes', init_debug);
+    // this.core._debug_report_schemas();
   }
 
-  @SubscribeMessage('link')
-  async onLink(client: Socket, id: string) {
-    const state = this.core.link(client.id, id);
-    client.emit('state', state);
+  @SubscribeMessage('debug.end')
+  async onEraseDebugSession(client: Socket, message: string) {
+    this.core.clear_match_data(message);
+    // this.core._debug_report_schemas();
+    client.emit('alpha-debug-clear');
+  }
+
+  @SubscribeMessage(events['link-to-game'].name)
+  async onLink(
+    client: Socket,
+    data: (typeof events)['link-to-game']['payload'],
+  ) {
+    console.log('linking');
+    client.join(data.match);
+    this.core.link(client.id, data.hero);
+
+    // check channel
+    this.server.to(data.match).emit('hi', 'hi');
+    this.server
+      .to(data.match)
+      .emit('scenes', this.core.scenes.match_scene_report(data.match));
+  }
+
+  /**
+   * after each cast heroes are provided with updated state, hence
+   * each scene should implement report() method to address to
+   * {
+   */
+  @SubscribeMessage(events['cast-in-scene'].name)
+  async onCast(
+    _: Socket,
+    message: (typeof events)['cast-in-scene']['payload'],
+  ) {
+    const scene = this.core.scenes.take_one(message.match_id, message.scene_id);
+    scene.cast(cardsDescription[message.casted_title]);
+    this.server.to(message.match_id).emit('scenes', scene.state);
   }
 }

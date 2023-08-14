@@ -4,3 +4,5 @@ node_modules
 */tg_session.json
 migrations
 yarn.lock
+.yarn
+.yarnrc.yml

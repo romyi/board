@@ -11,10 +11,16 @@ import { JwtModule } from '@nestjs/jwt';
 import { AlphaCoreGateway } from '@app/alpha/core/alpha-gateway.module';
 
 @Module({
-  imports: [AlphaCoreGateway, BotModule, AuthModule, ScheduleModule.forRoot(), UserModule, JwtModule.register({
-    secret: process.env.JWT_SECRET,
-    signOptions: { expiresIn: '2 days' }
-  })],
+  imports: [
+    AlphaCoreGateway,
+    AuthModule,
+    ScheduleModule.forRoot(),
+    UserModule,
+    JwtModule.register({
+      secret: process.env.JWT_SECRET,
+      signOptions: { expiresIn: '2 days' },
+    }),
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

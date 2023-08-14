@@ -15,7 +15,7 @@ export const Debug = () => {
   const { storage } = useMultitab<Array<{ name: string }>>("debug_heroes");
   const { storage: game } = useMultitab<{ id: string }>("match");
   const { storage: ids } =
-    useMultitab<Record<string, string>>("debug_hero_ids");
+    useMultitab<Array<{ name: string; hero_id: string }>>("debug_hero_ids");
   const [options, setoptions] = useState<DebugOptions>({
     heroes: storage.data || [],
     ongoing_mode: false,
@@ -25,8 +25,14 @@ export const Debug = () => {
     window.document.title = "Testing settings";
     sm.connect();
     sm.onMessage("alpha-debug-heroes", ({ heroes, match }) => {
+      console.log(heroes);
       ids.store(heroes);
       game.store({ id: match });
+      // window.location.reload();
+    });
+    sm.onMessage("alpha-debug-clear", () => {
+      localStorage.clear();
+      window.location.reload();
     });
   }, []);
   const [samples, setsamples] = useState(test_samples);
@@ -52,7 +58,12 @@ export const Debug = () => {
       data: [...options.heroes],
     });
   };
-  const onStopDebugClick = () => {};
+  const onStopDebugClick = () => {
+    sm.emit({
+      event: "debug.end",
+      data: game.data?.id,
+    });
+  };
   return (
     <main className="h-screen p-4 w-full">
       <article className=" m-auto mt-20 p-4 shadow-md bg-white-50 w-[400px] mih-[400px] rounded-lg">
@@ -99,9 +110,10 @@ export const Debug = () => {
                   ) : (
                     <a
                       className="col-start-4 text-cyan-600"
-                      href={`session?id=${ids.data?.[hero.name]}&name=${
-                        hero.name
-                      }`}
+                      href={`session?id=${
+                        ids.data?.find((sthero) => sthero.name === hero.name)
+                          ?.hero_id
+                      }&name=${hero.name}`}
                       target="_blank"
                       rel="noreferrer"
                     >
@@ -122,16 +134,6 @@ export const Debug = () => {
           </div>
           <p className="mt-4 text-slate-500 font-thin text-sm">
             ongoing mode <span className="text-pink-500 text-sm">soon</span>
-            {/* <input
-              disabled={true}
-              checked={options.ongoing_mode}
-              onChange={() =>
-                setoptions({ ...options, ongoing_mode: !options.ongoing_mode })
-              }
-              className="mt-4 ml-2"
-              type="checkbox"
-              id="debug-from-start"
-            /> */}
           </p>
           <p className="text-slate-500 text-xs font-thin mt-1">
             assign some cards to heroes and simulate various situations from
@@ -142,7 +144,10 @@ export const Debug = () => {
           {options.heroes.length > 2 ? (
             hasDebugOngoing ? (
               <>
-                <button className="mt-4 p-1 bg-slate-800 text-white">
+                <button
+                  onClick={onStopDebugClick}
+                  className="mt-4 p-1 bg-slate-800 text-white"
+                >
                   stop session
                 </button>
                 <p className="text-sm mt-4">{game.data?.id}</p>

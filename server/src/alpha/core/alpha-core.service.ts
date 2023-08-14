@@ -1,75 +1,54 @@
 import { Injectable } from '@nestjs/common';
-import type {
-  HeroSchema,
-  InterchangeState,
-  MatchSchema,
-  OwnerFirstCardSchema,
-} from '@shared/alpha/messages';
-import { cardsDescription, deck } from '@shared/alpha/configs';
-import { randomUUID } from 'crypto';
+import { CardRepository, HeroRepository, MatchRepository } from './repos';
+import { SceneRepository } from './repos/alpha-scene-repo';
 
 @Injectable()
 export class CoreService {
-  protected heroSchema: HeroSchema = new Map();
-  protected matchSchema: MatchSchema = new Map();
-  protected cardSchema: OwnerFirstCardSchema = new Map();
+  constructor(
+    protected heroes: HeroRepository,
+    protected cards: CardRepository,
+    protected matches: MatchRepository,
+    public scenes: SceneRepository,
+  ) {}
 
-  provide_state(client_id: string): InterchangeState {
-    const hero = this.heroSchema.get(client_id);
-    const match = this.matchSchema.get(hero.match_id);
-    return {
-      hero_id: client_id,
-      game_id: hero.match_id,
-      mode: 'mode',
-      tier: hero.tier,
-      power: hero.power,
-      cards: {
-        public: [],
-        private: [],
-      },
-      board: {
-        loots: 0,
-        doors: 0,
-        stash: 0,
-      },
-      opponents: match.heroes.filter(
-        (opponent) => opponent.hero_id !== client_id,
-      ),
-    };
-  }
-
+  // asap refactor: linking is somewhat happening with s.c. deskscene
+  // not core, e.g. desk.appendplayer => then scene mutates its state
+  // and players are pinged.
   link(socket_id: string, client_id: string) {
-    this.heroSchema.get(client_id).socket_id = socket_id;
-    return this.provide_state(client_id);
+    this.heroes.take_one(client_id).socket_id = socket_id;
   }
 
   init_match(heroes: { name: string }[]) {
-    const match_id = randomUUID();
-    this.matchSchema.set(match_id, { heroes: [] });
-    this.cardSchema.set(match_id, new Map());
-    deck.forEach((quantity, name) => {
-      for (let i = 0; i < quantity; i++) {
-        const card_id = randomUUID();
-        this.cardSchema
-          .get(match_id)
-          .set(card_id, { ...cardsDescription[name], card_id });
-      }
-    });
-    const for_client_persist = {};
+    // ERROR in method! gets correct amount of heroes
+    console.log(heroes);
+    const match_id = this.matches.create();
+    this.cards.link_owner(match_id);
+    this.cards.deal_decks(match_id);
+    const match = this.matches.take_one(match_id);
     heroes.map((hero) => {
-      const hero_id = randomUUID();
-      for_client_persist[hero.name] = hero_id;
-      this.heroSchema.set(hero_id, {
-        match_id,
-        socket_id: 'unknown',
-        tier: 1,
-        power: 1,
-        isInitiator: false,
-      });
-      this.cardSchema.set(hero_id, new Map());
-      this.matchSchema.get(match_id).heroes.push({ hero_id, name: hero.name });
-      return { name: hero.name, id: hero_id };
+      const hero_id = this.heroes.create(match_id);
+      console.log(this.matches.take_one(match_id));
+      match.heroes.push({ hero_id, name: hero.name });
+      // this.matches.take_one(match_id).heroes.push({ hero_id, name: hero.name });
+      this.cards.link_owner(hero_id);
     });
-    return { heroes: for_client_persist, match: match_id };
+    this.scenes.create(match_id, 'desk');
+    // returns wrong
+    console.log(this.matches.take_one(match_id).heroes);
+    return { heroes: this.matches.take_one(match_id).heroes, match: match_id };
+  }
+
+  clear_match_data(match_id: string) {
+    this.matches.take_one(match_id).heroes.forEach((hero) => {
+      this.heroes.erase(hero.hero_id);
+      this.cards.erase(hero.hero_id);
+    });
+    this.cards.erase(match_id);
+    this.scenes.erase(match_id);
+    this.matches.erase(match_id);
+  }
+
+  _debug_report_schemas() {
+    console.log(this.scenes, this.matches, this.cards, this.heroes);
   }
 }
